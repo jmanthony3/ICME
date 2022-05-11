@@ -1,0 +1,83 @@
+#!/bin/bash
+# usage: ev_curve <structure> <alat_guess>
+# ev_curve fcc 3.61
+# 
+# The script also requires input scripts for each structure named as follows:
+# fcc.ev.in
+# bcc.ev.in
+# hcp.ev.in
+# These scripts will define the pseudopotential, structure, and calculation parameters
+
+# Remove old files 
+rm EvsA EvsV evfit.4 SUMMARY
+
+sT="$(date +%s)"
+
+# Set the range and number of points generated
+low=`echo 0.8\*$2 | bc` 		# Sets the lower bound to 80% of guess
+high=`echo 1.2\*$2 | bc`		# Sets the upper bound to 120% of guess
+step=`echo "($high-$low)/20" | bc -l`	# Sets stepsize such that 20 points are created
+for a in `seq -w $low $step $high`
+do
+#a=2.9
+echo "a= $a" 
+a_au=`echo "$a/0.529" | bc -l`
+
+# Lattice vectors with fewest atoms
+if [ "$1" == fcc ] || [ "$1" == bcc ]
+then 
+natom=1
+
+elif [ "$1" == hcp ]
+then
+natom=2
+
+fi
+
+input=$1.ev.in
+ 
+# sed the lattice parameter
+curr=`grep "celldm(1)" $input | awk '{print $4}'`
+sed -i "s/celldm(1) $curr/celldm(1) =$a_au,/g" $input
+
+# Run Quantum Espresso with the correct input deck
+# Must provide path to executable
+pw.x < $input > pw_ev.out
+
+# Gather energy and volume data from the output file
+# Store the data in "EvsA" and "EvsV" text files
+V=`grep volume pw_ev.out | awk '{print $4}'`
+E=`grep "! *[ ] total energy" pw_ev.out | awk '{print $5}'`
+# Convert volume to Ang^3 and energy to eV
+V=`echo "$V*0.1481847" | bc -l`
+E=`echo "$E/$natom*13.605685" | bc -l`
+echo $a $E >> EvsA
+echo $V $E >> EvsV
+
+# Restart
+done
+
+# Once VASP has been run for each lattice parameter in the range
+# Run evfit routine with equation of state 4
+cat <<! | ./evfit
+$1
+4
+EvsA
+evfit.4
+!
+
+# Gather data from evfit output
+Emin=`grep Emin evfit.4|awk '{print $2}'`
+A0=`grep A0 evfit.4|awk '{print $2}'`
+K0=`grep A0 evfit.4|awk '{print $4}'`
+
+# Put that data in an output file called "SUMMARY"
+totT="$(($(date +%s)-sT))"
+
+echo "Data for $1" >> SUMMARY
+echo "=================================================" >> SUMMARY
+echo "Equilibrium Energy per Atom    = $Emin">>SUMMARY
+echo "Equilibrium lattice constant   = $A0">>SUMMARY
+echo "Bulk Modulus (kbar)            = $K0">>SUMMARY
+echo "Total RUN time (sec)           = $totT">>SUMMARY
+

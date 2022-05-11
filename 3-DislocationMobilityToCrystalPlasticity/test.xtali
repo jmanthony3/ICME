@@ -1,0 +1,68 @@
+1    500                                / crystalID (1:FCC, 2:BCC, 3:HCP), numgrn/
+fcc.sx                                  / single crystal input file
+
+1                                       / ODF code (fODFCode) /
+20                                      / multiples of inc to output texture (fODFOutInc) /
+texture                                 / filename for I/O texture /
+
+200  1.0d-5                             / maxIterState, tolerState /
+200  1.0d-10                            / maxIterNewt, tolerNewt (absolute tolerance) /
+
+ 20                                     / maxIterN (global Newton) /
+ 1.0d-8  1.0d-10  100.d0                / tolerN, zeroTolerN, divTolerN /
+
+ .true.                                 / alwaysLS (global line search) /
+ 2                                      / searchIters (if 0 -> LS is off) /
+ 0.1d0   2.5d0                          / maxStepSize, orthoToler /
+
+ 10                                     / maxIncrCuts (allowable time step cuts) /
+  6                                     / quickSolveTol (# iters in a "quick" solution) /
+  3                                     / quickSeriesTol (# "quick" solns before time step increase) /
+  0.01d0                                / DEQP_ref /
+
+ 1  1000.0                              / number of load stages, total time /
+ 1                                      / stage i
+  0.01   150                            / dtimeStage(i), incrStage(i) /
+ 1255.0    1255.0                       / thetaStage_n(i), thetaStage(i) /
+ 0.5d-0   0.0     0.0                   / velGradStage(i) - PSC /
+ 0.0      0.5d-0  0.0
+ 0.0      0.0    -1.0d-0
+
+------------------------------
+crystalID (1:FCC, 2:BCC, 3:HCP), numgrn
+
+elastID (1: iso, 2: ani)
+  Iso:
+     eMod, eNu
+  Ani: 
+     c1, c2, c3         (FCC,BCC)
+     c1, c2, c3, c4, c5 (HCP)
+
+xm, gam0
+h0, tausi, taus0, xms, gamss0
+kappa0
+
+kODF
+kODFout
+filename
+
+maxIterState, tolerState
+maxIterNewt, tolerNewt
+
+MaxIterN
+tolerN, zeroTolerN, divTolerN
+
+alwaysLineSearch
+searchIters
+maxStepSize, orthoToler
+
+maxIncrCuts
+quickSolveTol
+quickSeriesTol
+DEQP_ref
+
+numStages, totalTime
+Stage(i)
+DtimeStage(i), NincrStage(i)
+thetaStage_n(i), thetaStage(i)
+velGradStage(i)

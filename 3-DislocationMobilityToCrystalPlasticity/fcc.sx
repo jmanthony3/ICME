@@ -1,0 +1,49 @@
+2                                       / elastID (1: iso, 2: ani) /
+108.2e3  61.3e3  28.5e3                 / c11(c1), c12(c2), c44(c3) /
+10.0e-6  10.0e-6  10.0e-6   0.0e0   0.0e0   0.0e0       /Thermal expansion Coeffs/
+1.0        dummy for Cubic Crystals (for hcp: c/a ratio)
+2          nmodesx    (total # of modes listed in file)   
+1          nmodes     (# of modes to be used in the calculation)
+1          mode(i)    (label of the modes to be used)
+28               = nvtx (number of vertices of scys)
+vert_fcc.028.00  = filename for file with vertices of scys
+*<111>{110} SLIP
+ 1  12  1                           modex,nsmx,isensex
+ 0.05  1.0                            / xm, gam0 /
+ 5.e-4                                / bdrag /
+ 20.40  3.7  30.80  0.0-4  5.0e10    / h0, tausi, taus0, xms, gamss0 /
+ 3.7                                / initial slip system hardness (kappa0) /
+ 0.000   0       0.000   0.000           twshx,isectw,thres1,thres2  
+       1.0   1.0                         hlat(nmodes)
+   1.  1.  1.        0.  1. -1.
+   1.  1.  1.        1.  0. -1.
+   1.  1.  1.        1. -1.  0.
+  -1.  1.  1.        0.  1. -1.
+  -1.  1.  1.        1.  0.  1.
+  -1.  1.  1.        1.  1.  0.
+  -1. -1.  1.        0.  1.  1.
+  -1. -1.  1.        1.  0.  1.
+  -1. -1.  1.        1. -1.  0.
+   1. -1.  1.        0.  1.  1.
+   1. -1.  1.        1.  0. -1.
+   1. -1.  1.        1.  1.  0.
+*<111>{112} TWIN
+ 2  12  0                           modex,nsmx,isensex
+ 0.05  1.0                            / xm, gam0 /
+ 5.e-4                                / bdrag /
+ 20.40  3.7  30.80  0.0-4  5.0e10    / h0, tausi, taus0, xms, gamss0 /
+ 3.7                                / initial slip system hardness (kappa0) /
+ 0.707   0       0.100   0.500           twshx,isectw,thres1,thres2
+       1.0   1.0                         hlat(nmodes)
+   1.  1.  1.       -2.  1.  1.
+   1.  1.  1.        1. -2.  1.
+   1.  1.  1.        1.  1. -2.
+  -1.  1.  1.        2.  1.  1.
+  -1.  1.  1.       -1. -2.  1.
+  -1.  1.  1.       -1.  1. -2.
+  -1. -1.  1.        2. -1.  1.
+  -1. -1.  1.       -1.  2.  1.
+  -1. -1.  1.       -1. -1. -2.
+   1. -1.  1.       -2. -1.  1.
+   1. -1.  1.        1.  2.  1.
+   1. -1.  1.        1. -1. -2.
