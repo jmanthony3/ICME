@@ -1,2 +1,84 @@
-# ICME
-Scripts necessary to bridge certain length scales of Integrated Computational Materials Engineering design process.
+// document metadata
+= Integrated Computational Materials Engineering
+Joby M. Anthony III <jmanthony1@liberty.edu>
+:affiliation: PhD Student
+:document_version: 1.0
+:revdate: May 12, 2022
+:description: Scripts necessary to bridge certain length scales of Integrated Computational Materials Engineering design process.
+// :keywords: 
+:imagesdir: {docdir}/README
+// :bibtex-file: README.bib
+:toc: auto
+:xrefstyle: short
+:sectnums: |,all|
+:chapter-refsig: Chap.
+:section-refsig: Sec.
+:stem: latexmath
+:eqnums: AMS
+// :stylesdir: {docdir}
+// :stylesheet: asme.css
+// :noheader:
+// :nofooter:
+// :docinfodir: {docdir}
+// :docinfo: private
+:front-matter: any
+:!last-update-label:
+
+// example variable
+// :fn-1: footnote:[]
+
+// Python modules
+<%!
+    from engineering_notation import EngNumber as engr
+    import numpy as np
+    from pint import UnitRegistry as ureg
+%>
+// end document metadata
+
+
+
+
+
+// begin document
+[abstract]
+.Abstract
+
+// *Keywords:* _{keywords}_
+
+
+
+[#sec-setup, {counter:secs}]
+== Setup
+:!subs:
+:!figs:
+:!tabs:
+
+Environment
+. https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html[Download VMware Workstation 16 Player]
+. https://ubuntu.com/download/desktop[Download Ubuntu Desktop]
+Quantum Espresso
+. https://github.com/QEF/q-e/releases[Visit to download the flavor of choice]
+. https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm200[Input description]
+. https://pseudopotentiallibrary.org[Pseudopotentials]
+. http://www.physics.rutgers.edu/gbrv/#Fe[Pseudopotentials]
+. https://www.materialscloud.org/discover/sssp/table/efficiency[Pseudopotentials]
+. https://www.materialscloud.org/discover/sssp/table/precision[Pseudopotentials]
+
+
+
+
+// [appendix#sec-appendix-Figures]
+// == Figures
+
+
+
+[bibliography]
+== References
+bibliography::[]
+// end document
+
+
+
+
+
+// that's all folks 

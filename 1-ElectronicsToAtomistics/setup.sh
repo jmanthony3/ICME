@@ -4,7 +4,7 @@
 
 # define install path for Quantum Espresso (QE)
 QUANTUM_ESPRESSO_INSTALL_LOC=~/QuantumEspresso
-# encode name and version of tarball
+# encode name and version of tarball: qe-X.X.X
 QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
 # number of processors to use in test case
 NUM_PROC=2
@@ -27,7 +27,7 @@ sudo apt install build-essential
 
 # copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
-cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION.tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/$QUANTUM_ESPRESSO_VERSION.tar.gz"
+cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION*.tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/$QUANTUM_ESPRESSO_VERSION.tar.gz"
 cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
@@ -50,22 +50,20 @@ sudo apt install quantum-espresso
 cd "$execution_dir/Files"
 mkdir "test"
 mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" # executes the input parameters with QE
-gfortran -O2 "evfit.f" -o "./test/evfit" # compiles `evfit.f` outputs `ev_curve`
+gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `ev_curve`
 cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
-cp "Cu.in" "./test/fcc.ev.in"
-chmod +x ev_curve # makes file executable
+chmod +x ./ev_curve # makes file executable
 ./ev_curve fcc 3.628 # reference structure, lattice parameter
-cp "EvsA" "./test/EvsA"
-cp "EvsV" "./test/EvsV"
-cp "SUMMARY" "./test/SUMMARY"
-cp "pw_ev.out" "./test/pw_ev.out"
 python3 "EvA_EvV_plot.py" # generate plots
-cp "Name_of_EvA.pdf" "./test/Name_of_EvA.pdf"
-cp "Name_of_EvV.pdf" "./test/Name_of_EvV.pdf"
-cp "Name_of_Combined.pdf" "./test/Name_of_Combined.pdf"
-rm "EvsA" "EvsV" "SUMMARY"
-rm "fcc.ev.in" "evfit.4" "pw_ev.out"
-rm "Name_of_EvA.pdf" "Name_of_EvV.pdf" "Name_of_Combined.pdf"
+mv "fcc.ev.in" "./test/fcc.ev.in"
+mv "EvsA" "./test/EvsA"
+mv "EvsV" "./test/EvsV"
+mv "SUMMARY" "./test/SUMMARY"
+mv "pw_ev.out" "./test/pw_ev.out"
+mv "Name_of_EvA.pdf" "./test/Name_of_EvA.pdf"
+mv "Name_of_EvV.pdf" "./test/Name_of_EvV.pdf"
+mv "Name_of_Combined.pdf" "./test/Name_of_Combined.pdf"
+rm -rf "temp/"
 
 
 
@@ -78,6 +76,10 @@ curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
 sudo python2 get-pip.py
 pip2 --version
 pip2 install numpy
-echo "Recommend canceling the `gsfe_curve.py` process because this will take too long."
 # reference structure, lattice parameter, and block motion
 python2 "gsfe_curve.py" fcc 3.615 partial &
+pid=$!
+echo "Killing the 'gsfe_curve.py' process ('$pid') because this will take too long."
+kill $pid
+mv "gsfe.in" "./test/gsfe.in"
+mv "gsfe.out" "./test/gsfe.out"
