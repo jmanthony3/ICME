@@ -76,7 +76,8 @@ Visit any of the following for a pseudopotential file of choice:
 . https://www.materialscloud.org/discover/sssp/table/efficiency
 . https://www.materialscloud.org/discover/sssp/table/precision
 
-Place the desired pseudopotential file into `~/1-ElectronicsToAtomistics/Calculations/`
+Place the desired pseudopotential file into `~/1-ElectronicsToAtomistics/Calculations/`: all scripts contained herein reference this pseudopotential file.
+
 . https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm200[Input description]
 // . https://icme.hpc.msstate.edu/mediawiki/index.php/EvA_EvV_plot.py.html[`EvA_EvV_plot.py`]
 // . https://icme.hpc.msstate.edu/mediawiki/index.php/Convergence_plots.py.html[`Convergence_plots.py`]
@@ -85,6 +86,27 @@ Place the desired pseudopotential file into `~/1-ElectronicsToAtomistics/Calcula
 // . https://icme.hpc.msstate.edu/mediawiki/index.php/Ecut_conv.py.html[`Ecut_conv.py`]
 
 
+[#sec-electrons-energy_offset, {counter:subs}]
+=== Energy Offset
+Because every pseudopotential file uses different approximation schemes and methods, a calibrating calculation must be performed to ascertain the energy offset with respect to the embedding energy within an electron cloud.
+Navigate into `~/1-ElectronicsToAtomistics/Calculations/1-EnergyOffset` and execute the contained script: `./energy_offset.sh`.
+
+
+[#sec-electrons-kpoints, {counter:subs}]
+=== K-Point Study
+A similar process as that performed for mesh refinement studies must also be performed to determine the appropriate cutoff energy and number of k-points for QE calculations.
+This process must be performed for each pseudopotential file.
+Navigate into `~/1-ElectronicsToAtomistics/Calculations/2-KPointStudy` and execute the contained script: `./kpoint_study.sh`.
+
+
+[#sec-electrons-gsfe, {counter:subs}]
+=== GSFE Curve
+After determining which cutoff energy and number of k-points, navigate into `~/1-ElectronicsToAtomistics/Calculations/3-GSFE` and execute the script: `./gsfe_create.sh`.
+Upload to Rescale the contents of the `RescaleUpload` folder.
+If not existing already, create a `RescaleDownload` folder.
+Download the Rescale results into the `RescaleDownload` folder.
+Execute `./gsfe_process.sh`.
+The output `GSFE_SUMMARY-Calibration` file contains the target data for the MPCv4 calibration tool for the GSFE curve of the desired chemical system.
 
 
 
