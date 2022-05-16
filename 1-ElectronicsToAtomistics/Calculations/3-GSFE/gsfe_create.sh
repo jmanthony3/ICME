@@ -201,8 +201,8 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 
 # cat "SUMMARY"
 
+rm -r "RescaleUpload/"
 mkdir "RescaleUpload"
-rm "RescaleUpload/"*
 cd "../0-Scripts/"
 mkdir "input_gens"
 # reference structure, lattice parameter, and block motion
