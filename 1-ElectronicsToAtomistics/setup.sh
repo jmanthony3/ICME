@@ -75,6 +75,7 @@ sudo apt install python3-pip
 pip3 install matplotlib numpy
 python3 "EvA_EvV_plot.py" # generate plots
 set +x
+mv "evfit" "./test/evfit"
 mv "fcc.ev.in" "./test/fcc.ev.in"
 mv "EvsA" "./test/EvsA"
 mv "EvsV" "./test/EvsV"
