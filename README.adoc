@@ -2,8 +2,8 @@
 = Integrated Computational Materials Engineering
 Joby M. Anthony III <jmanthony1@liberty.edu>
 :affiliation: PhD Student
-:document_version: 1.0
-:revdate: May 12, 2022
+:document_version: 1.1
+:revdate: May 16, 2022
 :description: Scripts necessary to bridge certain length scales of Integrated Computational Materials Engineering design process.
 // :keywords: 
 :imagesdir: {docdir}/README
@@ -27,12 +27,12 @@ Joby M. Anthony III <jmanthony1@liberty.edu>
 // example variable
 // :fn-1: footnote:[]
 
-// Python modules
-<%!
-    from engineering_notation import EngNumber as engr
-    import numpy as np
-    from pint import UnitRegistry as ureg
-%>
+// // Python modules
+// <%!
+//     from engineering_notation import EngNumber as engr
+//     import numpy as np
+//     from pint import UnitRegistry as ureg
+// %>
 // end document metadata
 
 
