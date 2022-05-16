@@ -53,16 +53,37 @@ Joby M. Anthony III <jmanthony1@liberty.edu>
 :!figs:
 :!tabs:
 
-Environment
-. https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html[Download VMware Workstation 16 Player]
-. https://ubuntu.com/download/desktop[Download Ubuntu Desktop]
-Quantum Espresso
-. https://github.com/QEF/q-e/releases[Visit to download the flavor of choice]
+If host machine is Debian-based distro, then skip ahead to....
+Otherwise, setup a https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html[virtual (guest) machine] (VMware Workstation 16 Player) with an https://ubuntu.com/download/desktop[Ubuntu Desktop].
+Afterward, clone this repository `git clone https://github.com/jmanthony3/ICME.git` wherever desired in guest machine.
+
+
+
+[#sec-electrons_to_atoms, {counter:secs}]
+== Bridging Electronics to Atomistics
+:!subs:
+:!figs:
+:!tabs:
+
+Using some Quantum Espresso flavor of choice, get the tarball of the desired https://github.com/QEF/q-e/releases[flavor] and put into `~/1-ElectronicsToAtomistics/Files/`.
+To install the Quantum Espresso environment, navigate to the directory of and execute the `~/1-ElectronicsToAtomistics/setup.sh` bash script.
+Regardless of existing packages on guest machine, this script will make the desired flavor of Quantum Espresso; update the `$PATH` environment variable; install the `cmake`, `gcc`, `gfortran`, and `make` capabilities; install Python 2; and, perform tests to demonstrate 
+
+Visit any of the following for a pseudopotential file of choice:
+
+. https://pseudopotentiallibrary.org
+. http://www.physics.rutgers.edu/gbrv/#Fe
+. https://www.materialscloud.org/discover/sssp/table/efficiency
+. https://www.materialscloud.org/discover/sssp/table/precision
+
+Place the desired pseudopotential file into `~/1-ElectronicsToAtomistics/Calculations/`
 . https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm200[Input description]
-. https://pseudopotentiallibrary.org[Pseudopotentials]
-. http://www.physics.rutgers.edu/gbrv/#Fe[Pseudopotentials]
-. https://www.materialscloud.org/discover/sssp/table/efficiency[Pseudopotentials]
-. https://www.materialscloud.org/discover/sssp/table/precision[Pseudopotentials]
+// . https://icme.hpc.msstate.edu/mediawiki/index.php/EvA_EvV_plot.py.html[`EvA_EvV_plot.py`]
+// . https://icme.hpc.msstate.edu/mediawiki/index.php/Convergence_plots.py.html[`Convergence_plots.py`]
+// . https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_plot.py.html[`EOS_plot.py`]
+// . https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_comp_plot.py.html[`EOS_comp_plot.py`]
+// . https://icme.hpc.msstate.edu/mediawiki/index.php/Ecut_conv.py.html[`Ecut_conv.py`]
+
 
 
 

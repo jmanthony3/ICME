@@ -16,6 +16,7 @@ REFERENCE_STRUCTURE="bcc" # body-centered cubic
 LATTICE_PARAMETER=2.866 # angstrom, literature value for element
 CUTOFF_ENERGY=90
 MAX_ITER=500
+MIXING_BETA=0.5
 KPOINT=12 # k-points for convergence
 KPOINTS=( # number of k-points (think as mesh grid element count)
     $KPOINT # x
@@ -27,7 +28,7 @@ KPOINTS_SHIFT=( # shift of `KPOINTS` in some direction
     0 # y
     0 # z
 )
-NUM_PROC=4
+NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
@@ -40,92 +41,109 @@ NUM_PROC=4
 
 
 ### automatically define other `.in` file variables from inputs
-case $REFERENCE_STRUCTURE in
-
-    "fcc" | "FCC")
-        IBRAV=2
-        ;;
-
-    "bcc" | "BCC")
-        IBRAV=3
-        ;;
-esac
+reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
+if [[ "$reference_structure" == "fcc" ]]; then
+    ibrav=2
+elif [[ "$reference_structure" == "bcc" ]]; then
+    ibrav=3
+else
+    set +x
+    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
+    exit
+    set -x
+fi
+set +x
+echo "Based on $reference_structure, ibrav=$ibrav"
+set -x
 # converts to bohr and sets to large value for offset
-LATTICE_PARAMETER_BOHR=$(echo "$LATTICE_PARAMETER*1.88973*4" | bc -l) # bohr
-INPUT_FILENAME="${ELEMENT_NAME}_offset" # name input file
+lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973*4" | bc -l) # bohr
+input_filename="${ELEMENT_NAME}_offset" # name input file
 
 
 ### write input file
 # input file
+set +x
 echo """ &control
     prefix=''
     outdir='temp'
     pseudo_dir = '../',
  /
  &system
-    ibrav=  $IBRAV, celldm(1) =$LATTICE_PARAMETER_BOHR, nat=  1, ntyp=  1,
+    ibrav=  $ibrav, celldm(1) =$lattice_parameter_bohr, nat=  1, ntyp=  1,
     ecutwfc =$CUTOFF_ENERGY,
     occupations='smearing', smearing='mp', degauss=0.06
  /
  &electrons
     electron_maxstep =$MAX_ITER,
-    mixing_beta =0.5,
+    mixing_beta =$MIXING_BETA,
  /
 ATOMIC_SPECIES
  $ELEMENT_NAME  $ELEMENT_AMU $PSEUDOPOTENTIAL_FILENAME
 ATOMIC_POSITIONS (alat)
  $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
 K_POINTS (automatic)
- ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}""" > "$INPUT_FILENAME.in"
+ ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}""" > "$input_filename.in"
+echo "========== Contents of $input_filename.in =========="
+cat "$input_filename.in"
+echo "===================================================="
+set -x
 
 
 
 ################### CALCULATE OFFSET ENERGY ###################
 ### execute QE with input parameters
-mpirun -np $NUM_PROC pw.x -in "$INPUT_FILENAME.in" > "$INPUT_FILENAME.out"
+set +x
+echo "Executing QE according to $input_filename.in..."
+set -x
+mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out"
 
 
 ### grab `total energy`, which is in Ry, from `.out` file
 energy_offset=$(
     # grabs only the Ry value
-    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$INPUT_FILENAME.out" | sed "s% Ry$%%"
+    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | sed "s% Ry$%%"
 )
 energy_offset=$(echo "$energy_offset*-13.6057" | bc) # '*-13.6057' converts Ry to eV
-echo "Energy offset found to be $energy_offset eV."
+set +x
+echo "Energy offset found to be $energy_offset eV"
+set -x
 
 
 ### replace offset energies in companion scripts
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../KPointStudy/kpoint_study.sh"
-sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $energy_offset%" "../Scripts/EvA_EvV_plot.py"
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../GSFE/gsfe_create.sh"
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../GSFE/gsfe_process.sh"
+sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $energy_offset%" "../0-Scripts/EvA_EvV_plot.py"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../2-KPointStudy/kpoint_study.sh"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../3-GSFE/gsfe_create.sh"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../3-GSFE/gsfe_process.sh"
 
 
 ### run Fortran codes on input files
-gfortran -O2 "../Scripts/evfit.f" -o "../Scripts/evfit" # compiles `evfit.f` outputs `evfit`
-chmod +x "../Scripts/ev_curve" # makes file executable
-cp "$INPUT_FILENAME.in" "$REFERENCE_STRUCTURE.ev.in" # create appropriate input file to `ev_curve`
-cp "$INPUT_FILENAME.in" "../Scripts/$REFERENCE_STRUCTURE.ev.in" # create appropriate input file to `ev_curve`
-cd "../Scripts"
+cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in" # create appropriate input file to `ev_curve`
+cd "../0-Scripts"
+gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
+chmod +x "ev_curve" # makes file executable
 # this outputs `evfit.4`: reference structure, lattice parameter
-./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER
-cp "EvsA" "../EnergyOffset/EvsA_offset"
-cp "EvsV" "../EnergyOffset/EvsV_offset"
-cp "SUMMARY" "../EnergyOffset/SUMMARY_offset"
+./ev_curve $reference_structure $LATTICE_PARAMETER
 python3 "EvA_EvV_plot.py" # generate plots
-cp "Name_of_EvA.pdf" "../EnergyOffset/Name_of_EvA.pdf"
-cp "Name_of_EvV.pdf" "../EnergyOffset/Name_of_EvV.pdf"
-cp "Name_of_Combined.pdf" "../EnergyOffset/Name_of_Combined.pdf"
-rm "EvsA" "EvsV" "SUMMARY"
-rm "$REFERENCE_STRUCTURE.ev.in" "evfit.4" "pw_ev.out"
-rm "Name_of_EvA.pdf" "Name_of_EvV.pdf" "Name_of_Combined.pdf"
-rm -r "temp"
-cd "../EnergyOffset"
+set +x
+mv "$reference_structure.ev.in" "../1-EnergyOffset/$reference_structure.ev.in"
+mv "EvsA" "../1-EnergyOffset/EvsA_offset"
+mv "EvsV" "../1-EnergyOffset/EvsV_offset"
+mv "SUMMARY" "../1-EnergyOffset/SUMMARY_offset"
+mv "Name_of_EvA.pdf" "../1-EnergyOffset/Name_of_EvA.pdf"
+mv "Name_of_EvV.pdf" "../1-EnergyOffset/Name_of_EvV.pdf"
+mv "Name_of_Combined.pdf" "../1-EnergyOffset/Name_of_Combined.pdf"
+mv "evfit.4" "../1-EnergyOffset/evfit.4"
+mv "pw_ev.out" "../1-EnergyOffset/pw_ev.out"
+set -x
+rm -r "temp/"
+cd "../1-EnergyOffset"
 declare -a inputs=(
     "EvsA_offset"
     "EvsV_offset"
 )
 for input in "${inputs[@]}"; do
+    set +x
+    echo "Opening $input to offset by $energy_offset eV..."
     i=1
     readarray file < $input
     for line in "${file[@]}"; do
@@ -135,7 +153,11 @@ for input in "${inputs[@]}"; do
         sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
         i=$(echo "$i+1" | bc)
     done # end line `i`
+    echo "Closing $input..."
+    set -x
 done # end of `input` file
+set +x
+echo "Adjusting summary files by $energy_offset eV..."
 energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY_offset")
 offset_energy=$(echo "$energy+$energy_offset" | bc)
 sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY_offset"
@@ -144,4 +166,12 @@ bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY_offset")
 bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
 sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY_offset"
 
+echo "Energy offset found to be $energy_offset eV"
+set -x
+
 cat "SUMMARY_offset"
+
+
+
+
+# that's all folks
