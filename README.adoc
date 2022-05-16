@@ -67,7 +67,7 @@ Afterward, clone this repository `git clone https://github.com/jmanthony3/ICME.g
 
 Using some Quantum Espresso flavor of choice, get the tarball of the desired https://github.com/QEF/q-e/releases[flavor] and put into `~/1-ElectronicsToAtomistics/Files/`.
 To install the Quantum Espresso environment, navigate to the directory of and execute the `~/1-ElectronicsToAtomistics/setup.sh` bash script.
-Regardless of existing packages on guest machine, this script will make the desired flavor of Quantum Espresso; update the `$PATH` environment variable; install the `cmake`, `gcc`, `gfortran`, and `make` capabilities; install Python 2; and, perform tests to demonstrate 
+Regardless of existing packages on guest machine, this script will make the desired flavor of Quantum Espresso; update the `$PATH` environment variable; install the `cmake`, `gcc`, `gfortran`, and `make` capabilities; install Python 2; and, perform tests to demonstrate (hopeful) success of installing environment and executing scripts.
 
 Visit any of the following for a pseudopotential file of choice:
 

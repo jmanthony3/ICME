@@ -45,6 +45,7 @@ ENERGY_OFFSET=4473.05298206 # Ry
 
 
 
+set +x
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -52,14 +53,10 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     ibrav=3
 else
-    set +x
     echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
     exit
-    set -x
 fi
-set +x
 echo "Based on $reference_structure, ibrav=$ibrav"
-set -x
 # converts to bohr and sets to large value for offset
 lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l) # bohr
 
@@ -76,17 +73,13 @@ sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENE
 #################### PERFORM K-POINT STUDY ####################
 ### examine for every cutoff energy
 for cutoff_energy in "${CUTOFF_ENERGIES[@]}"; do
-    set +x
     echo "Examining 'ecutwfc=$cutoff_energy' Ry..."
-    set -x
     # to store results in directory
     mkdir "$cutoff_energy"
     cd "$cutoff_energy"
     # examine for every k-point
     for K in "${KPOINTS[@]}"; do
-        set +x
         echo "Examining $K kpoints..."
-        set -x
         kpoints=( # number of k-points (think as mesh grid element count)
             $K # x
             $K # y
@@ -99,7 +92,6 @@ for cutoff_energy in "${CUTOFF_ENERGIES[@]}"; do
         )
         input_filename="$ELEMENT_NAME.$cutoff_energy.$K" # name input file
         # define input file
-        set +x
         echo """ &control
     prefix=''
     outdir='temp'
@@ -123,8 +115,7 @@ K_POINTS (automatic)
 
         ### execute QE with input parameters
         echo "Executing QE according to $input_filename.in..."
-        set -x
-        mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out"
+        (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out")
 
 
         ### run Fortran codes on input files
@@ -138,17 +129,16 @@ K_POINTS (automatic)
         # this outputs `evfit.4`: reference structure, lattice parameter
         ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER
         python3 "EvA_EvV_plot.py" # generate plots
-        set +x
         mv "$REFERENCE_STRUCTURE.ev.in" "../2-KPointStudy/$cutoff_energy/$REFERENCE_STRUCTURE.ev.in" # create appropriate input file to `ev_curve`
+        mv "evfit" "../2-KPointStudy/$cutoff_energy/evfit"
         mv "EvsA" "../2-KPointStudy/$cutoff_energy/EvsA.$cutoff_energy.$K"
         mv "EvsV" "../2-KPointStudy/$cutoff_energy/EvsV.$cutoff_energy.$K"
         mv "SUMMARY" "../2-KPointStudy/$cutoff_energy/SUMMARY.$cutoff_energy.$K"
+        mv "evfit.4" "../2-KPointStudy/$cutoff_energy/evfit.4"
+        mv "pw_ev.out" "../2-KPointStudy/$cutoff_energy/pw_ev.out"
         mv "Name_of_EvA.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_EvA.pdf"
         mv "Name_of_EvV.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_EvV.pdf"
         mv "Name_of_Combined.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_Combined.pdf"
-        mv "evfit.4" "../2-KPointStudy/$cutoff_energy/evfit.4"
-        mv "pw_ev.out" "../2-KPointStudy/$cutoff_energy/pw_ev.out"
-        set -x
         rm -r "temp/"
         cd "../2-KPointStudy/$cutoff_energy/"
         declare -a inputs=(
@@ -156,8 +146,7 @@ K_POINTS (automatic)
             "EvsV.$cutoff_energy.$K"
         )
         for input in "${inputs[@]}"; do
-            set +x
-            echo "Opening $input to offset by $energy_offset eV..."
+            echo "Opening $input to offset by $ENERGY_OFFSET eV..."
             i=1
             readarray file < $input
             for line in "${file[@]}"; do
@@ -168,17 +157,14 @@ K_POINTS (automatic)
                 i=$(echo "$i+1" | bc)
             done # end line `i`
             echo "Closing $input..."
-            set -x
         done # end of `input` file
-        set +x
-        echo "Adjusting summary files by $energy_offset eV..."
+        echo "Adjusting summary files by $ENERGY_OFFSET eV..."
         energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY.$cutoff_energy.$K")
         offset_energy=$(echo "$energy+$ENERGY_OFFSET" | bc)
         sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY.$cutoff_energy.$K"
         bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY.$cutoff_energy.$K")
         bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
         sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY.$cutoff_energy.$K"
-        set -x
     done # end of `K`-point
     cd "../"
 done # end of `cutoff_energy`

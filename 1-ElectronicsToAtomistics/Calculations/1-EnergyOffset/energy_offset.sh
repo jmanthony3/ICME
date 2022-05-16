@@ -40,6 +40,7 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
+set +x
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -47,14 +48,10 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     ibrav=3
 else
-    set +x
     echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
     exit
-    set -x
 fi
-set +x
 echo "Based on $reference_structure, ibrav=$ibrav"
-set -x
 # converts to bohr and sets to large value for offset
 lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973*4" | bc -l) # bohr
 input_filename="${ELEMENT_NAME}_offset" # name input file
@@ -62,7 +59,6 @@ input_filename="${ELEMENT_NAME}_offset" # name input file
 
 ### write input file
 # input file
-set +x
 echo """ &control
     prefix=''
     outdir='temp'
@@ -86,16 +82,13 @@ K_POINTS (automatic)
 echo "========== Contents of $input_filename.in =========="
 cat "$input_filename.in"
 echo "===================================================="
-set -x
 
 
 
 ################### CALCULATE OFFSET ENERGY ###################
 ### execute QE with input parameters
-set +x
 echo "Executing QE according to $input_filename.in..."
-set -x
-mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out"
+(set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out")
 
 
 ### grab `total energy`, which is in Ry, from `.out` file
@@ -104,9 +97,7 @@ energy_offset=$(
     sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | sed "s% Ry$%%"
 )
 energy_offset=$(echo "$energy_offset*-13.6057" | bc) # '*-13.6057' converts Ry to eV
-set +x
 echo "Energy offset found to be $energy_offset eV"
-set -x
 
 
 ### replace offset energies in companion scripts
@@ -124,17 +115,16 @@ chmod +x "ev_curve" # makes file executable
 # this outputs `evfit.4`: reference structure, lattice parameter
 ./ev_curve $reference_structure $LATTICE_PARAMETER
 python3 "EvA_EvV_plot.py" # generate plots
-set +x
 mv "$reference_structure.ev.in" "../1-EnergyOffset/$reference_structure.ev.in"
+mv "evfit" "../1-EnergyOffset/evfit"
 mv "EvsA" "../1-EnergyOffset/EvsA_offset"
 mv "EvsV" "../1-EnergyOffset/EvsV_offset"
 mv "SUMMARY" "../1-EnergyOffset/SUMMARY_offset"
+mv "evfit.4" "../1-EnergyOffset/evfit.4"
+mv "pw_ev.out" "../1-EnergyOffset/pw_ev.out"
 mv "Name_of_EvA.pdf" "../1-EnergyOffset/Name_of_EvA.pdf"
 mv "Name_of_EvV.pdf" "../1-EnergyOffset/Name_of_EvV.pdf"
 mv "Name_of_Combined.pdf" "../1-EnergyOffset/Name_of_Combined.pdf"
-mv "evfit.4" "../1-EnergyOffset/evfit.4"
-mv "pw_ev.out" "../1-EnergyOffset/pw_ev.out"
-set -x
 rm -r "temp/"
 cd "../1-EnergyOffset"
 declare -a inputs=(
@@ -142,7 +132,6 @@ declare -a inputs=(
     "EvsV_offset"
 )
 for input in "${inputs[@]}"; do
-    set +x
     echo "Opening $input to offset by $energy_offset eV..."
     i=1
     readarray file < $input
@@ -154,9 +143,7 @@ for input in "${inputs[@]}"; do
         i=$(echo "$i+1" | bc)
     done # end line `i`
     echo "Closing $input..."
-    set -x
 done # end of `input` file
-set +x
 echo "Adjusting summary files by $energy_offset eV..."
 energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY_offset")
 offset_energy=$(echo "$energy+$energy_offset" | bc)
@@ -165,9 +152,6 @@ lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY_of
 bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY_offset")
 bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
 sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY_offset"
-
-echo "Energy offset found to be $energy_offset eV"
-set -x
 
 cat "SUMMARY_offset"
 

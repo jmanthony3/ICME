@@ -32,7 +32,7 @@ sudo apt install build-essential
 
 # copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
-cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/$QUANTUM_ESPRESSO_VERSION.tar.gz"
+cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/"
 cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
@@ -75,6 +75,7 @@ sudo apt install python3-pip
 pip3 install matplotlib numpy
 python3 "EvA_EvV_plot.py" # generate plots
 set +x
+mv "evfit" "./test/evfit"
 mv "fcc.ev.in" "./test/fcc.ev.in"
 mv "EvsA" "./test/EvsA"
 mv "EvsV" "./test/EvsV"
