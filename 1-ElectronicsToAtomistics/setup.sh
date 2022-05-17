@@ -50,7 +50,10 @@ echo "export PATH=\"$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION/
 
 # Update environment variables.
 echo "Updating environment variables for $who..."
-(set -x; source ~/.bashrc)
+(set -x;
+    source ~/.bashrc
+    pw.x --version
+)
 
 
 
