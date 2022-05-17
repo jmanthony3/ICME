@@ -54,11 +54,12 @@ echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:$PATH\"" >> "~/.bashrc
 (set -x; source ~/.bashrc)
 
 # copy/paste necessary files for example
-cd "./Files"
+cd "$execution_dir/Files"
+mkdir "test"
 mkdir "test/RescaleUpload"
-cp "./Cu.meam" "./test/RescaleUpload/Cu.meam"
-cp "./Dislocation.f90" "./test/RescaleUpload/Dislocation.f90"
-cp "./DisVelocity.in" "./test/RescaleUpload/DisVelocity.in"
-cp "./library.meam" "./test/RescaleUpload/library.meam"
-cp "./rescale_commands.sh" "./test/RescaleUpload/rescale_commands.sh"
-cp "./atoms.sh" "./test/RescaleUpload/atoms.sh"
+cp "Cu.meam" "./test/RescaleUpload/Cu.meam"
+cp "Dislocation.f90" "./test/RescaleUpload/Dislocation.f90"
+cp "DisVelocity.in" "./test/RescaleUpload/DisVelocity.in"
+cp "library.meam" "./test/RescaleUpload/library.meam"
+cp "rescale_commands.sh" "./test/RescaleUpload/rescale_commands.sh"
+cp "atoms.sh" "./test/RescaleUpload/atoms.sh"
