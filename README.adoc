@@ -108,6 +108,21 @@ Download the Rescale results into the `RescaleDownload` folder.
 Execute `./gsfe_process.sh`.
 The output `GSFE_SUMMARY-Calibration` file contains the target data for the MPCv4 calibration tool for the GSFE curve of the desired chemical system.
 
+https://icme.hpc.msstate.edu/mediawiki/index.php/Category:Electronic_Scale.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Evfit.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Ev_curve.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Calculation_of_elastic_constants.html#The_Script
+https://icme.hpc.msstate.edu/mediawiki/index.php/Surface_formation_energy_calculation_for_fcc_(111),_(110)_and_(100).html
+https://icme.hpc.msstate.edu/mediawiki/index.php/EvA_EvV_plot.py.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Convergence_plots.py.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_plot.py.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_comp_plot.py.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Ecut_conv.py.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/Gsfe_curve.html
+https://icme.hpc.msstate.edu/mediawiki/index.php/MPC.html#Build_LAMMPS.2BMEAM_for_MPCv4_on_Linux_with_MATLAB_R2017b_and_gcc-4.9.3
+https://www.youtube.com/watch?v=1YTUQm7xY60
+https://www.youtube.com/watch?v=4hgEv8C_KOw
+
 
 
 // [appendix#sec-appendix-Figures]

@@ -3,36 +3,55 @@
 
 
 # define path into where Quantum Espresso will install
-OVITO_INSTALL_LOC="~/Ovito"
+OVITO_INSTALL_LOC=~/Ovito
 # encode name and version of of tarball
 OVITO_VERSION="ovito-basic-3.7.2-x86_64"
+NUM_PROC=$(nproc) # grabs all cores available by default
 
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - END OF HUMAN EDITABLE SECTION - - - - - - - - #
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+
+
+
+
+set +x
 execution_dir=$(pwd)
-NUM_PROC=2
+who=$(whoami)
 
 
 
-### ================ ###
-### Installing Ovito
-### ================ ###
+### installing lammps
+# https://docs.lammps.org/Install_linux.html
+(set -x
+    sudo add-apt-repository ppa:gladky-anton/lammps
+    sudo add-apt-repository ppa:openkim/latest
+    sudo apt-get update
+    sudo apt-get install lammps-stable
+    sudo apt-get update
+    sudo apt-get install lammps-stable-doc
+    sudo apt-get install lammps-stable-data
+    sudo apt-get install openkim-models
+set +x)
+
+
+
+### installing ovito
 # https://www.ovito.org/linux-downloads/
 # https://www.ovito.org/manual/installation.html
-
-# Copy/Paste the `Files/qe-X.X.X.tar.gz`
-# archive into a working directory.
 mkdir "$OVITO_INSTALL_LOC"
-cp "Files/$OVITO_VERSION.tar.gz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.gz"
+cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 cd "$OVITO_INSTALL_LOC"
-# Unzip with `tar -xzvf ovito-X.X.X.tar.gz`.
-tar xJfv "$OVITO_VERSION.tar.gz"
-
-# To set path to `pw.x` as environment variable
-# change PATH as needed to QE `/bin/` folder.
-# cd ~ && gedit .bashrc && export PATH="$OVITO_INSTALL_LOC/q-e-$OVITO_VERSION/bin:$PATH"
-echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:$PATH\"" >> "~/.bashrc"
+# Unzip with `tar xJfv ovito-X.X.X.tar.xz`.
+tar xJfv "$OVITO_VERSION.tar.xz"
 
 # Update environment variables.
-source .bashrc
+echo "Updating environment variables for $who..."
+echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:$PATH\"" >> "~/.bashrc"
+(set -x; source ~/.bashrc)
 
 
 
