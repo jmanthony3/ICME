@@ -77,6 +77,8 @@ for cutoff_energy in "${CUTOFF_ENERGIES[@]}"; do
     # to store results in directory
     mkdir "$cutoff_energy"
     cd "$cutoff_energy"
+    rm "./EvsK" "./AvsK" "./GvsK" "./TvsK"
+    touch "./EvsK" "./AvsK" "./GvsK" "./TvsK"
     # examine for every k-point
     for K in "${KPOINTS[@]}"; do
         echo "Examining $K kpoints..."
@@ -165,6 +167,13 @@ K_POINTS (automatic)
         bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY.$cutoff_energy.$K")
         bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
         sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY.$cutoff_energy.$K"
+        # touch "./EvsK" "./AvsK" "./GvsK" "./TvsK"
+        echo "$K $offset_energy" >> "./EvsK"
+        alat=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY.$cutoff_energy.$K")
+        echo "$K $alat" >> "./AvsK"
+        echo "$K $bulk_gpa" >> "./GvsK"
+        conv_time=$(sed -n "s%^Total RUN time (sec)           = %%p" "SUMMARY.$cutoff_energy.$K")
+        echo "$K $conv_time" >> "./TvsK"
     done # end of `K`-point
     cd "../"
 done # end of `cutoff_energy`
