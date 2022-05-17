@@ -1,9 +1,8 @@
-from joby_m_anthony_iii import numerical_methods as nm
 import matplotlib.pyplot as plt
 import numpy as np
 
-plot_first, plot_30 = False, False
-legend_labels = ["30", "60", "90", "120"] if plot_30 else ["60", "90", "120"]
+plot_first = False
+legend_labels = np.arange(30, 135, 15, dtype=str)
 
 ### equilibrium energy
 fig, (ax1, ax2) = plt.subplots(1, 2)
