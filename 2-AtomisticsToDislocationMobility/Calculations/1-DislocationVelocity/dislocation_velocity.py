@@ -1,4 +1,3 @@
-from multiprocessing.sharedctypes import Value
 from engineering_notation import EngNumber as engr
 import joby_m_anthony_iii.numerical_methods as nm
 import matplotlib.pyplot as plt
@@ -10,7 +9,7 @@ import sympy as sp
 dt = 500
 # must be same examined in `rescale_commands.sh`
 # if not a range, then define as blank string: TEMP = ""
-TEMP = np.array([300]) # np.arange(150, 500, 50)
+TEMP = np.array([300]) # np.arange(150, 550, 50)
 # if not a range, then define as blank string: SIGMA = ""
 SIGMA = np.arange(25, 325, 25)
 

@@ -24,6 +24,8 @@ cp "library.meam" "../1-DislocationVelocity/RescaleUpload/"
 cp "rescale_commands.sh" "../1-DislocationVelocity/RescaleUpload/"
 cp "atoms.sh" "../1-DislocationVelocity/RescaleUpload/"
 
+(set -x; python3 -m pip install engineering_notation joby_m_anthony_iii pandas sympy)
+
 
 
 

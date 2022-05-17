@@ -35,7 +35,7 @@ DISLOCATION_TYPE="Edge" # edge or screw
 STRUCTURE_TYPE="PAD" # 1) cylinder; 2) PAD; 3) Perfect FCC crystal
 
 # define according to: seq FIRST STEP LAST
-declare -a TEMP=($(seq 150 50 500))        # desired temperature
+declare -a TEMP=(300) # ($(seq 150 50 500))        # desired temperature
 # define according to: seq FIRST STEP LAST
 declare -a SIGMA=($(seq 25 25 300))          # applied stress in MPa
 equilTime=10000     # number of increment to equilibrate the temperature
