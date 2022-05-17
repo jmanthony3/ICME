@@ -17,10 +17,10 @@ path = os.getcwd()
 #######################################################
 
 # Print to screen/pdf or not
-write_to_screen = True
+write_to_screen = False
 print_to_pdf    = True 
 
-energy_offset = 2858.8298734 # Set by running simulation with very large lattice parameter
+energy_offset = 4479.41619611 # Set by running simulation with very large lattice parameter
 
 #Color options for plots
 # Best source for colors = https://xkcd.com/color/rgb/
