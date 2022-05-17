@@ -173,10 +173,13 @@ K_POINTS (automatic)
         echo "$K $alat" >> "./AvsK"
         echo "$K $bulk_gpa" >> "./GvsK"
         conv_time=$(sed -n "s%^Total RUN time (sec)           = %%p" "SUMMARY.$cutoff_energy.$K")
-        echo "$K $conv_time" >> "./TvsK"
+        conv_iter=$(sed -n "s%^[[:blank:]]*convergence has been achieved in[[:blank:]]*%%p" "$input_filename.out" | sed "s% iterations$%%")
+        echo "$K $conv_time $conv_iter" >> "./TvsK"
     done # end of `K`-point
     cd "../"
 done # end of `cutoff_energy`
+
+python3 "./which_ecutwfc.py"
 
 
 

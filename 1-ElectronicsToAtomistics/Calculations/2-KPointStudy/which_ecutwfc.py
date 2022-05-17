@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
-plot_first = False
-legend_labels = np.arange(30, 135, 15, dtype=str)
+plot_first = True
+cutoff_energies = np.arange(30, 135, 15)
+kpoint = 8
+legend_labels = [str(eng) for eng in cutoff_energies]
+filepath = os.path.dirname(os.path.abspath(__file__))
 
 ### equilibrium energy
 fig, (ax1, ax2) = plt.subplots(1, 2)
@@ -17,9 +21,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-esub_normal = float(open(f"./{legend_labels[-1]}/EvsK").readlines()[-1].split(" ")[-1])
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/EvsK", "r") as f:
+esub_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/EvsK").readlines()[-1].split(" ")[-1])
+for ecutwfc in cutoff_energies:
+    with open(f"{filepath}/{ecutwfc}/EvsK", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         E = np.zeros((len(lines), 1))
@@ -32,14 +36,14 @@ for ecutwfc in legend_labels:
             K[i] = int(line_split[0])
             E[i] = float(line_split[1])
             if ecutwfc=="60":
-                if K[i]==8: print(E[i])
+                if K[i]==kpoint: print(E[i])
             if i > 0:
                 N[i-1] = np.abs((E[i] - esub_normal)/((E[i] + esub_normal)/2))*100
             i += 1
     ax1.plot(K if plot_first else K[1:], E if plot_first else E[1:])
     ax2.plot(K[1:] if plot_first else K[2:], N if plot_first else N[1:])
 
-    if ecutwfc==legend_labels[-1]: print(E[-1])
+    if ecutwfc==cutoff_energies[-1]: print(E[-1])
 
 # Create the legend
 fig.legend([ax1, ax2], # The line objects
@@ -67,9 +71,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-alat_normal = float(open(f"./{legend_labels[-1]}/KvsA").readlines()[-1].split(" ")[-1])
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/KvsA", "r") as f:
+alat_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/AvsK").readlines()[-1].split(" ")[-1])
+for ecutwfc in cutoff_energies:
+    with open(f"{filepath}/{ecutwfc}/AvsK", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         A = np.zeros((len(lines), 1))
@@ -82,14 +86,14 @@ for ecutwfc in legend_labels:
             K[i] = int(line_split[0])
             A[i] = float(line_split[1])
             if ecutwfc=="60":
-                if K[i]==8: print(A[i])
+                if K[i]==kpoint: print(A[i])
             if i > 0:
                 N[i-1] = np.abs((A[i] - alat_normal)/((A[i] + alat_normal)/2))*100
             i += 1
     ax1.plot(K if plot_first else K[1:], A if plot_first else A[1:])
     ax2.plot(K[1:] if plot_first else K[2:], N if plot_first else N[1:])
 
-    if ecutwfc==legend_labels[-1]: print(A[-1])
+    if ecutwfc==cutoff_energies[-1]: print(A[-1])
 
 # Create the legend
 fig.legend([ax1, ax2], # The line objects
@@ -117,9 +121,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-bulk_normal = float(open(f"./{legend_labels[-1]}/GvsK").readlines()[-1].split(" ")[-1])/10
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/GvsK", "r") as f:
+bulk_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/GvsK").readlines()[-1].split(" ")[-1])/10
+for ecutwfc in cutoff_energies:
+    with open(f"{filepath}/{ecutwfc}/GvsK", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         G = np.zeros((len(lines), 1))
@@ -137,7 +141,7 @@ for ecutwfc in legend_labels:
     ax1.plot(K if plot_first else K[1:], G if plot_first else G[1:])
     ax2.plot(K[1:] if plot_first else K[2:], N if plot_first else N[1:])
 
-    if ecutwfc==legend_labels[-1]: print(G[-1])
+    if ecutwfc==cutoff_energies[-1]: print(G[-1])
 
 # Create the legend
 fig.legend([ax1, ax2], # The line objects
@@ -165,9 +169,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Iterations")
 )
-time_normal = int(open(f"./{legend_labels[-1]}/TvsK").readlines()[-1].split(" ")[1])
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/TvsK", "r") as f:
+time_normal = int(open(f"{filepath}/{cutoff_energies[-1]}/TvsK").readlines()[-1].split(" ")[1])
+for ecutwfc in cutoff_energies:
+    with open(f"{filepath}/{ecutwfc}/TvsK", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         T = np.zeros((len(lines), 1))
@@ -200,56 +204,56 @@ plt.savefig("./convergence_versus_kpoint.svg")
 
 
 
-### EvsA
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.set(
-    xlabel=("Lattice Parameter [" + r"$\AA$]"),
-    ylabel=("Equilibrium Energy per Atom [" + r"$eV$]")
-)
-ax2.yaxis.set_ticks_position("right")
-ax2.yaxis.set_label_position("right")
-# ax2.set_yscale("symlog")
-ax2.set(
-    xlabel=("Lattice Parameter Volume [" + r"$\AA^{3}$]"),
-    ylabel=("Equilibrium Energy per Atom [" + r"$eV$]")
-)
-do_full, do_bcc = False, True
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/EvsA.{ecutwfc}.8" if do_full else f"../EvsA-{'bcc' if do_bcc else 'fcc'}-Calibration", "r") as f:
-        lines = f.readlines()
-        A = np.zeros((len(lines), 1))
-        E = np.zeros((len(lines), 1))
-        i = 0
-        for line in lines:
-            line_split = line.split(" ")
-            if "\n" in line_split[1]:
-                line_split[1] = line_split[1][:-1]
-            A[i] = float(line_split[0])
-            E[i] = float(line_split[1])
-            i += 1
-    ax1.plot(A if plot_first else A[1:], E if plot_first else E[1:])
-for ecutwfc in legend_labels:
-    with open(f"./{ecutwfc}/EvsA.{ecutwfc}.8" if do_full else f"../EvsA-{'bcc' if do_bcc else 'fcc'}-Calibration", "r") as f:
-        lines = f.readlines()
-        V = np.zeros((len(lines), 1))
-        E = np.zeros((len(lines), 1))
-        i = 0
-        for line in lines:
-            line_split = line.split(" ")
-            if "\n" in line_split[1]:
-                line_split[1] = line_split[1][:-1]
-            V[i] = float(line_split[0])
-            E[i] = float(line_split[1])
-            i += 1
-    ax2.plot(V if plot_first else V[1:], E if plot_first else E[1:])
+# ### EvsA
+# fig, (ax1, ax2) = plt.subplots(1, 2)
+# ax1.set(
+#     xlabel=("Lattice Parameter [" + r"$\AA$]"),
+#     ylabel=("Equilibrium Energy per Atom [" + r"$eV$]")
+# )
+# ax2.yaxis.set_ticks_position("right")
+# ax2.yaxis.set_label_position("right")
+# # ax2.set_yscale("symlog")
+# ax2.set(
+#     xlabel=("Lattice Parameter Volume [" + r"$\AA^{3}$]"),
+#     ylabel=("Equilibrium Energy per Atom [" + r"$eV$]")
+# )
+# do_full, do_bcc = False, True
+# for ecutwfc in cutoff_energies:
+#     with open(f"{filepath}/{ecutwfc}/EvsA.{ecutwfc}.{kpoint}" if do_full else f"../EvsA-{'bcc' if do_bcc else 'fcc'}-Calibration", "r") as f:
+#         lines = f.readlines()
+#         A = np.zeros((len(lines), 1))
+#         E = np.zeros((len(lines), 1))
+#         i = 0
+#         for line in lines:
+#             line_split = line.split(" ")
+#             if "\n" in line_split[1]:
+#                 line_split[1] = line_split[1][:-1]
+#             A[i] = float(line_split[0])
+#             E[i] = float(line_split[1])
+#             i += 1
+#     ax1.plot(A if plot_first else A[1:], E if plot_first else E[1:])
+# for ecutwfc in cutoff_energies:
+#     with open(f"{filepath}/{ecutwfc}/EvsA.{ecutwfc}.{kpoint}" if do_full else f"../EvsA-{'bcc' if do_bcc else 'fcc'}-Calibration", "r") as f:
+#         lines = f.readlines()
+#         V = np.zeros((len(lines), 1))
+#         E = np.zeros((len(lines), 1))
+#         i = 0
+#         for line in lines:
+#             line_split = line.split(" ")
+#             if "\n" in line_split[1]:
+#                 line_split[1] = line_split[1][:-1]
+#             V[i] = float(line_split[0])
+#             E[i] = float(line_split[1])
+#             i += 1
+#     ax2.plot(V if plot_first else V[1:], E if plot_first else E[1:])
 
-# Create the legend
-fig.legend([ax1, ax2], # The line objects
-    labels=legend_labels, # The labels for each line
-    loc="lower center", # Position of legend
-    ncol=len(legend_labels),
-    borderaxespad=0.1, # Small spacing around legend box
-    title="Cutoff Energies" # Title for the legend
-)
-plt.subplots_adjust(bottom=0.225)
-plt.savefig("./EvsA_for_energy.svg")
+# # Create the legend
+# fig.legend([ax1, ax2], # The line objects
+#     labels=legend_labels, # The labels for each line
+#     loc="lower center", # Position of legend
+#     ncol=len(legend_labels),
+#     borderaxespad=0.1, # Small spacing around legend box
+#     title="Cutoff Energies" # Title for the legend
+# )
+# plt.subplots_adjust(bottom=0.225)
+# plt.savefig("{filepath}/EvsA_for_energy.svg")
