@@ -2,7 +2,7 @@
 
 
 
-# define path into where Quantum Espresso will install
+# define path into where Ovito will install
 OVITO_INSTALL_LOC=~/Ovito
 # encode name and version of of tarball
 OVITO_VERSION="ovito-basic-3.7.2-x86_64"

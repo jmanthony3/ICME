@@ -51,6 +51,7 @@ runTime=100000      # number of increment to calibrate the velocity
 
 
 
+set +x
 ### collect arguments into single tuple
 ATOM_DISLOCATION_ARGUMENTS=(
     $REFERENCE_STRUCTURE # 0
@@ -67,76 +68,59 @@ for temp in "${TEMP[@]}"; do
 
         ### modify arguments tuple to replace strings with integer selections
         # reference structure selection
-        case $(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]') in
-
-            "fcc")
-                ATOM_DISLOCATION_ARGUMENTS[0]="1"
-                ;;
-
-            "bcc")
-                ATOM_DISLOCATION_ARGUMENTS[0]="2"
-                ;;
-
-            "hcp")
-                ATOM_DISLOCATION_ARGUMENTS[0]="3"
-                ;;
-        esac
+        reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
+        if [[ "$reference_structure" == "fcc" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[0]="1"
+        elif [[ "$reference_structure" == "bcc" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[0]="2"
+        elif [[ "$reference_structure" == "hcp" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[0]="3"
+        else
+            echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc', 'bcc', or 'hcp'."
+            exit
+        fi
         # element name selection
-        case $ELEMENT_NAME in
-
-            "Ni" | "Fe")
-                ATOM_DISLOCATION_ARGUMENTS[1]="1"
-                ;;
-
-            "Cu" | "Nb")
-                ATOM_DISLOCATION_ARGUMENTS[1]="2"
-                ;;
-
-            "Al" | "Ta")
-                ATOM_DISLOCATION_ARGUMENTS[1]="3"
-                ;;
-
-            "Mo")
-                ATOM_DISLOCATION_ARGUMENTS[1]="4"
-                ;;
-
-            "W (Zhou)")
-                ATOM_DISLOCATION_ARGUMENTS[1]="5"
-                ;;
-
-            "W (Auckland)")
-                ATOM_DISLOCATION_ARGUMENTS[1]="6"
-                ;;
-        esac
-        case $(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]') in
-
-            "edge")
-                ATOM_DISLOCATION_ARGUMENTS[3]="1"
-                ;;
-
-            "screw")
-                ATOM_DISLOCATION_ARGUMENTS[3]="2"
-                ;;
-        esac
-        case $(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]') in
-
-            "cylinder")
-                ATOM_DISLOCATION_ARGUMENTS[4]="1"
-                ;;
-
-            "pad")
-                ATOM_DISLOCATION_ARGUMENTS[4]="2"
-                ;;
-
-            "perfect fcc crystal")
-                ATOM_DISLOCATION_ARGUMENTS[4]="3"
-                ;;
-        esac
+        if [[ $ELEMENT_NAME == "Ni" ]] || [[ $ELEMENT_NAME == "Fe" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="1"
+        elif [[ $ELEMENT_NAME == "Cu" ]] || [[ $ELEMENT_NAME == "Nb" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="2"
+        elif [[ $ELEMENT_NAME == "Al" ]] || [[ $ELEMENT_NAME == "Ta" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="3"
+        elif [[ $ELEMENT_NAME == "Mo" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="4"
+        elif [[ $ELEMENT_NAME == "W (Zhou)" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="5"
+        elif [[ $ELEMENT_NAME == "W (Auckland)" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[1]="6"
+        else
+            echo "Variable ELEMENT_NAME=$ELEMENT_NAME not understood."
+            exit
+        fi
+        dislocation_type=$(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]')
+        if [[ $dislocation_type == "edge" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[3]="1"
+        elif [[ $dislocation_type == "screw" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[3]="2"
+        else
+            echo "Variable DISLOCATION_TYPE=$DISLOCATION_TYPE not understood. Must be either 'edge' or 'screw'."
+            exit
+        fi
+        structure_type=$(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]')
+        if [[ $structure_type == "cylinder" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[4]="1"
+        elif [[ $structure_type == "pad" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[4]="2"
+        elif [[ $structure_type == "perfect fcc crystal" ]]; then
+            ATOM_DISLOCATION_ARGUMENTS[4]="3"
+        else
+            echo "Variable STRUCTURE_TYPE=$STRUCTURE_TYPE not understood. Must be either 'cylinder', 'PAD' or 'Perfect FCC crystal'."
+            exit
+        fi
 
 
-        gfortran -O3 "Dislocation.f90" -o "atom-dislocation"
+        (set -x; gfortran -O3 "Dislocation.f90" -o "atom-dislocation")
         # generates atom.`REFERENCE_STRUCTURE`.`DISLOCATION_TYPE`.`STRUCTURE_TYPE` file
-        ./atoms.sh ${ATOM_DISLOCATION_ARGUMENTS[0]} ${ATOM_DISLOCATION_ARGUMENTS[1]} $ELEMENT_NUM ${ATOM_DISLOCATION_ARGUMENTS[3]} ${ATOM_DISLOCATION_ARGUMENTS[4]}
+        (set -x; ./atoms.sh ${ATOM_DISLOCATION_ARGUMENTS[0]} ${ATOM_DISLOCATION_ARGUMENTS[1]} $ELEMENT_NUM ${ATOM_DISLOCATION_ARGUMENTS[3]} ${ATOM_DISLOCATION_ARGUMENTS[4]})
 
 
         ### ignore consequent errors
