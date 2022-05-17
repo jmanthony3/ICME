@@ -6,6 +6,8 @@ import os
 import pandas as pd
 import sympy as sp
 
+filepath = os.path.dirname(os.path.abspath(__file__))
+
 dt = 500
 # must be same examined in `rescale_commands.sh`
 # if not a range, then define as blank string: TEMP = ""
@@ -28,7 +30,7 @@ for temp in TEMP:
                 xlabel="Time (t) [" + r"$ps$]",
                 ylabel="Displacement (x) [" + r"$\AA$]",
             )
-            data_dir = f"./PositionFrameData/{int(temp)}/{int(sigma)}"
+            data_dir = f"{filepath}/PositionFrameData/{int(temp)}/{int(sigma)}"
             if do_every:
                 particles = {}
                 for i in range(0, len(next(os.walk(data_dir))[2]), skip):
@@ -125,4 +127,4 @@ for temp in TEMP:
                 s=f"{engr(velocity)}*t + {engr(offset)}"
             )
             ax_sigma.legend()
-            fig_sigma.savefig(f"position_for_time-{int(temp)}/{int(sigma)}.pdf")
+            fig_sigma.savefig(f"./position_for_time-{int(temp)}/{int(sigma)}.svg")
