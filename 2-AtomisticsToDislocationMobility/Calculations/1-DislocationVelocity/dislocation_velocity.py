@@ -10,6 +10,8 @@ import warnings
 # warnings.filterwarnings("ignore", module="matplotlib\..*")
 warnings.filterwarnings(action="ignore", module="numpy/*", message="Empty input file", category=UserWarning)
 
+filepath = os.path.dirname(os.path.abspath(__file__))
+
 # 194.8
 dt, width = 0.500, 40 * 5   # lattice distance * unit distance (approx)
 offset      = 40.0
@@ -24,11 +26,11 @@ print(burger_vec)
 
 # must be same examined in `rescale_commands.sh`
 # if not a range, then define as blank string: TEMP = ""
-TEMP = np.array([300]) # np.arange(150, 500, 50) # K
+TEMP = np.array([300]) # np.arange(150, 550, 50) # K
 # if not a range, then define as blank string: SIGMA = ""
 SIGMA = np.arange(25, 325, 25) # MPa
-for s in np.array([700, 800, 900, 1000, 1100, 1200]):
-    SIGMA = np.append(SIGMA, s)
+# for s in np.array([700, 800, 900, 1000, 1100, 1200]):
+#     SIGMA = np.append(SIGMA, s)
 
 skip = 1
 columns = ["Particle Identifier", "X", "Y", "Z", "Centrosymmetry", "R", "G", "B", "nan", "Time"]
@@ -56,7 +58,7 @@ try:
             f.write(f"Stress Velocity\n")
             for sigma in SIGMA:
                 x_ave, lap_count = 0, 0
-                data_dir = f"./PositionFrameData/{temp}/{sigma:.3f}"
+                data_dir = f"{filepath}/PositionFrameData/{temp}/{sigma:.3f}"
                 if do_every:
                     particles = {}
                     for i in range(0, len(next(os.walk(data_dir))[2]), skip):
@@ -201,14 +203,14 @@ try:
                 other_pos = velocity*time + offset
                 ax_sigma.plot(time, other_pos, label=f"{sigma} MPa: {pft_string}")
             ax_sigma.legend()
-            fig_sigma.savefig(f"position_for_time-{temp}.pdf")
+            fig_sigma.savefig(f"position_for_time-{temp}.svg")
         with open(f"dislocation_velocity-{temp}", "r") as f:
             data = pd.DataFrame(np.genfromtxt(f.readlines())[1:], columns=["Stress", "Velocity"])
             drag = burger_vec/float(str(nm.least_squares.linear(data['Stress'][:12], data['Velocity'][:12], 1)[0](sp.Symbol('t'))).split('*')[0])*1e6 # Pa-s
             DRAG[f"{temp}"] = 1/drag
             ax_temp.scatter(data["Stress"], data["Velocity"], label=f"{temp} K" + r"$\rightarrow$ B = " + f"{drag:3e}" + r" Pa-s")
         ax_temp.legend()
-        fig_temp.savefig(f"velocity_for_stress.pdf")
+        fig_temp.savefig(f"velocity_for_stress.svg")
 finally:
     sys.stdout.close()
     sys.stdout = old_stdout
