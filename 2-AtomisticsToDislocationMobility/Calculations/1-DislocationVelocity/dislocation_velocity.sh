@@ -14,6 +14,7 @@ set +x
 ### collect arguments into single tuple
 rm -r "RescaleUpload/"
 mkdir "RescaleUpload"
+mkdir "PositionFrameData"
 cd "../0-Scripts/"
 cp "Cu.meam" "../1-DislocationVelocity/RescaleUpload/"
 cp "Dislocation.f90" "../1-DislocationVelocity/RescaleUpload/"
