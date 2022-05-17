@@ -51,10 +51,7 @@ tar xJfv "$OVITO_VERSION.tar.xz"
 # Update environment variables.
 echo "Updating environment variables for $who..."
 echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:\$PATH\"" >> ~/.bashrc
-(set -x;
-    source ~/.bashrc
-    ovito --version
-)
+(set -x; source ~/.bashrc)
 
 # copy/paste necessary files for example
 cd "$execution_dir/Files"
