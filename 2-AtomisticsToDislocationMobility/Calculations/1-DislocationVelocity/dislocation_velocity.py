@@ -22,7 +22,7 @@ midpoint    = width / 2
 lattice_parameter = 2.781e-10 # m
 slip_direction = np.array([1, 1, 1])
 burger_vec = lattice_parameter*(nm.norms(slip_direction).l_two()/2) # (np.sqrt(3)/2)
-print(burger_vec)
+print(r"Magnitude of Burger's vector, $\|\vec{b}\|$ = " + f"{burger_vec}")
 
 # must be same examined in `rescale_commands.sh`
 # if not a range, then define as blank string: TEMP = ""
@@ -174,7 +174,7 @@ try:
                         if "t" != str(position_expr(sp.Symbol("t")))[-1]:
                             velocity = float(str(position_expr(sp.Symbol("t"))).split(" ")[0].split("*")[0])
                             offset = float(str(position_expr(sp.Symbol("t"))).split(" ")[-1])
-                        else :
+                        else:
                             velocity = float(str(position_expr(sp.Symbol("t"))).split(" ")[-1].split("*")[0])
                             offset = float(str(position_expr(sp.Symbol("t"))).split(" ")[0])
                         velocities.append(velocity)
@@ -207,11 +207,20 @@ try:
         with open(f"dislocation_velocity-{temp}", "r") as f:
             data = pd.DataFrame(np.genfromtxt(f.readlines())[1:], columns=["Stress", "Velocity"])
             drag = burger_vec/float(str(nm.least_squares.linear(data['Stress'][:12], data['Velocity'][:12], 1)[0](sp.Symbol('t'))).split('*')[0])*1e6 # Pa-s
-            DRAG[f"{temp}"] = 1/drag
+            DRAG[f"{temp}"] = (drag, 1/drag)
             ax_temp.scatter(data["Stress"], data["Velocity"], label=f"{temp} K" + r"$\rightarrow$ B = " + f"{drag:3e}" + r" Pa-s")
         ax_temp.legend()
         fig_temp.savefig(f"velocity_for_stress.svg")
 finally:
     sys.stdout.close()
     sys.stdout = old_stdout
-    print(DRAG)
+
+    # print(DRAG)
+
+    # Print the names of the columns.
+    print ("{:<10} {:<10}".format(r"Temperature [$K$]", r"Drag Coefficient ($B$) [$Pa-s$]", r"Dislocation Mobility ($M_{s}$) [$\frac{1}{Pa-s}$]"))
+
+    # print each data item.
+    for key, value in DRAG.items():
+        coeff, mob = value
+        print ("{:<10} {:<10} {:<10}".format(key, coeff, mob))
