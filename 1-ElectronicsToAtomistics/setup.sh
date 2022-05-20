@@ -78,17 +78,17 @@ echo "Ensuring pip3 capabilities for matplotlib and numpy..."
     python3 -m pip install matplotlib numpy
     python3 "EvA_EvV_plot.py" # generate plots
 )
-mv "evfit" "./test/evfit"
-mv "fcc.ev.in" "./test/fcc.ev.in"
-mv "EvsA" "./test/EvsA"
-mv "EvsV" "./test/EvsV"
-mv "SUMMARY" "./test/SUMMARY"
-mv "pw_ev.out" "./test/pw_ev.out"
-mv "Name_of_EvA.pdf" "./test/Name_of_EvA.pdf"
-mv "Name_of_EvV.pdf" "./test/Name_of_EvV.pdf"
-mv "Name_of_Combined.pdf" "./test/Name_of_Combined.pdf"
-mv "evfit.4" "./test/evfit.4"
-mv "pw_ev.out" "./test/pw_ev.out"
+mv "evfit" "./test/"
+mv "fcc.ev.in" "./test/"
+mv "EvsA" "./test/"
+mv "EvsV" "./test/"
+mv "SUMMARY" "./test/"
+mv "pw_ev.out" "./test/"
+mv "Name_of_EvA.pdf" "./test/"
+mv "Name_of_EvV.pdf" "./test/"
+mv "Name_of_Combined.pdf" "./test/"
+mv "evfit.4" "./test/"
+mv "pw_ev.out" "./test/"
 rm -r "temp/"
 
 
@@ -106,7 +106,7 @@ echo "Installing Python 2..."
     pip2 install numpy
 )
 # reference structure, lattice parameter, and block motion
-python2 "gsfe_curve.py" fcc 3.615 partial &
+(set -x; python2 "gsfe_curve.py" fcc 3.615 partial &)
 sleep 5s
 pid=$(pgrep pw.x)
 echo "Killing the 'gsfe_curve.py' process ('PID=$pid') because this will take too long..."
@@ -115,6 +115,17 @@ mv "gsfe.in" "./test/gsfe.in"
 mv "gsfe.out" "./test/gsfe.out"
 mv "GSFE_SUMMARY" "./test/GSFE_SUMMARY"
 rm -r "temp/"
+
+
+
+### populate "../Calculations/0-Scripts/" folder
+cp "ev_curve" "../Calculations/0-Scripts/"
+cp "EvA_EvV_plot.py" "../Calculations/0-Scripts/"
+cp "evfit.f" "../Calculations/0-Scripts/"
+cp "gsfe_curve.py" "../Calculations/0-Scripts/"
+cp "OutputFileCreator.py" "../Calculations/0-Scripts/"
+cp "OutputSummarizer.py" "../Calculations/0-Scripts/"
+cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 
 
 
