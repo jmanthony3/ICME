@@ -63,3 +63,5 @@ cp "../Calculations/0-Scripts/DisVelocity.in" "./test/RescaleUpload/DisVelocity.
 cp "../Calculations/0-Scripts/library.meam" "./test/RescaleUpload/library.meam"
 cp "../Calculations/0-Scripts/rescale_commands.sh" "./test/RescaleUpload/rescale_commands.sh"
 cp "../Calculations/0-Scripts/atoms.sh" "./test/RescaleUpload/atoms.sh"
+
+cp "../Calculations/0-Scripts/datain" "../Calculations/2-MDDP/"

@@ -1,0 +1,25 @@
+Cell size (sidex,sidey,sidez)
+2000 2000 10000 
+The coordinate axis coincides with the crystal: 1=rotate
+0
+Enter the direction of the x-axis and y-axis
+1 0 0
+0 1 0
+---------  beginning of multilayer data  -------------
+The following 4 data blocks are relevant to the multilayer case only.
+They will be read only if you make "8:multilayer_suite" as you input.
+1. number of active Bilayer units (1 or 2)
+	2
+2.1 Dimensions of the unit bilayer 1 (sidex,sidey,sidez), ALWAYS ACTIVE
+	2000 2000 80
+2.2 Thickness (in %) of the top layer wrt to the total bilayer 1 thickness
+	50
+3.1 Dimensions of the unit bilayer 2 (sidex,sidey,sidez),Activated (y/n)
+	2000 2000 80
+3.2 Thickness (in %) of the top layer wrt to the total bilayer 2 thickness
+	50
+4.1 Enter COHERENCY (different from APPLIED) stress in the OVERLAY.(Pa)
+   -2.6e9   -2.6e9  0.0 0.0 0.0 0.0
+4.2 Enter COHERENCY (different from APPLIED) stress in the SUBSTRATE.(Pa)
+    2.6e9    2.6e9  0.0 0.0 0.0 0.0
+---------  end of multilayer data  --------------------

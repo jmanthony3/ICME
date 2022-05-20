@@ -11,7 +11,6 @@
 
 
 set +x
-### collect arguments into single tuple
 rm -r "RescaleUpload/"
 mkdir "RescaleUpload"
 mkdir "RescaleDownload"
