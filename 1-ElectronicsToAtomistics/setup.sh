@@ -31,7 +31,7 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
     sudo apt install build-essential
 )
 
-copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
+# copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
 cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/"
 cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
