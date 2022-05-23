@@ -67,3 +67,17 @@ cp "atoms.sh" "./test/RescaleUpload/"
 cp "datain" "../Calculations/0-Scripts/"
 cp "datain" "../Calculations/2-MDDP/"
 cp "MDDP_BCC_HW2.7z" "../Calculations/2-MDDP/"
+
+
+wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-6/libgfortran3_6.4.0-17ubuntu1_amd64.deb
+sudo dpkg -i libgfortran3_6.4.0-17ubuntu1_amd64.deb
+
+cd "../Calculations/2-MDDP/"
+(set -x;
+    sudo apt install p7zip-full
+    7z x "MDDP_BCC_HW2.7z"
+)
+
+cd "MDDP_BCC_HW2/MDDP_Zip/Linux"
+chmod +x "BCCdata"
+chmod +x "FCCdata"
