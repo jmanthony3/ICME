@@ -26,7 +26,7 @@ print("Magnitude of Burger's vector, ||b|| = " + f"{burger_vec} m", end="\n\n")
 
 # must be same examined in `rescale_commands.sh`
 TEMP = np.array([300]) # np.arange(150, 550, 50) # K
-STRAIN = np.array([3, dtype=int]) # np.arange(1, 7, 1) # 1/s
+STRAIN = np.array([3], dtype=int) # np.arange(1, 7, 1) # 1/s
 # for s in np.array([-3, -2, -1]):
 #     STRAIN = np.append(STRAIN, s)
 STRAIN = 10**STRAIN
@@ -34,7 +34,7 @@ STRAIN = 10**STRAIN
 skip = int(1.5e2)
 columns = ["timenow", "disDensity", "Stress", "Strain", "S1", "S2", "S3", "S23", "S31", "S12", "p1", "p2", "p3", "p23", "p31",  "p12", "jogs", "junctions", "CrossSlip"]
 
-do_monitor = False
+do_monitor = True
 
 if do_monitor:
     fig, ax = plt.subplots(1, 1)
