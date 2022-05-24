@@ -34,18 +34,20 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
 # copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
 cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/"
-cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
+echo "+ cd $QUANTUM_ESPRESSO_INSTALL_LOC"
+echo "+ tar -xzvf $QUANTUM_ESPRESSO_VERSION.tar.gz"
 (set -x;
-    (tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz")&> "$execution_dir/quantum_espresso_untar.log"
-)
+    cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
+    tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
+)&> "$execution_dir/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure && make all`
-(set -x;
-    cd "q-e-$QUANTUM_ESPRESSO_VERSION"
-    (./configure)&> "$execution_dir/quantum_espresso_configure.log"
-    (make all)&> "$execution_dir/quantum_espresso_make.log"
-)
+(set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION")
+echo "+ ./configure"
+(set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && ./configure)&> "$execution_dir/quantum_espresso_configure.log"
+echo "+ make all"
+(set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && make all)&> "$execution_dir/quantum_espresso_make.log"
 
 # set `pw.x` as environment variable change PATH as needed to QE `/bin/` folder
 echo "export PATH=\"$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION/bin:\$PATH\"" >> ~/.bashrc

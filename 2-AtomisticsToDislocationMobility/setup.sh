@@ -44,11 +44,13 @@ who=$(whoami)
 # https://www.ovito.org/manual/installation.html
 mkdir "$OVITO_INSTALL_LOC"
 cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
-cd "$OVITO_INSTALL_LOC"
 # Unzip with `tar xJfv ovito-X.X.X.tar.xz`.
+echo "+ cd $OVITO_INSTALL_LOC"
+echo "+ tar xJfv $OVITO_VERSION.tar.xz"
 (set -x;
-    (tar xJfv "$OVITO_VERSION.tar.xz")&> "$execution_dir/ovito_untar.log"
-)
+    cd "$OVITO_INSTALL_LOC"
+    tar xJfv "$OVITO_VERSION.tar.xz"
+)&> "$execution_dir/ovito_untar.log"
 
 # Update environment variables.
 echo "Updating environment variables for $who..."
