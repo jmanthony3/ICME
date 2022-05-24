@@ -131,7 +131,8 @@ https://www.youtube.com/watch?v=4hgEv8C_KOw
 :!figs:
 :!tabs:
 
-https://www.ovito.org/download-other/
+https://www.ovito.org/linux-downloads/
+https://gist.github.com/sakethramanujam/faf5b677b6505437dbdd82170ac55322
 
 
 
