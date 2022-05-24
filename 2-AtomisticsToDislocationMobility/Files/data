@@ -1,0 +1,113 @@
+c tag::helloMethod[]
+1.--crystal------maxstep------sidex------sidey------sidez
+ 'BCC' 
+                     1000000 2000 2000 10000 
+2.--denisty(kg/m3)---shr(Pa)(MO)--pois--mobility(1/pa.s)--ba(m)
+   7874    11.7e10          0.29  46346.06396828521     2.4084166479245236e-10
+3.--temper--stkfe(J/m^2) --ismobil--amfactor--Conduc--HeatCond.
+      300.0  0               1        0.025   390.   385.
+4.--npolorder---ncell-----ifree(0,1,or 3) --nsface1(3) --- nsface2(3)
+    1            0           1         1 1 1      1 1 1
+5.--nscx, y, z (subcells and FEA elements)
+10 10 40
+6.--Finiteelement(indexFE=0,1,2),indexFE1=0(GenData),1(Read) nfea:DD/FE steps
+   0 0 100
+7.--Defect (loopfile 0=nodefects,1=YES)--ndz=1(loops),2(SFT's),3(square)
+   0 2
+8.--Coordinate system (w.r.t. crystal)
+ 1. 0. 0.
+ 0. 1. 0.
+ 0. 0. 1.
+9.--Index : print results Every N steps (nndx)
+       100 0  1
+10.--IntegOption(IDTdd=0 Const dt,1 Varible), imeshdd(0=cons, 1=auto)
+   1 1
+End of data--------------------------------------------------------------------
+c end::helloMethod[]
+
+
+
+   1. -1. 0.
+    1. 1. -2.
+    1. 1. 1.
+
+
+
+c JUNK!
+
+   1. 1. 0.
+  -1. 1. 2.
+   1. -1. 1.
+
+     1. 0. 0.
+    0. 1. 0.
+    0. 0. 1.
+
+ 1. 1. 0
+ -1 1 0
+  0 0 1
+
+-1 1 -1
+-2 -1 1
+ 0 1 1
+
+
+1. 1. 0.
+-1. 1. -2.
+-1. 1. 1.
+
+Lassila
+ 1. -2. 1. 
+  -2. 9. 20.
+  -49. -22. 5.
+
+
+
+
+   1. 0. -1.
+   0. 1. 0.
+   1. 0. 1.             
+
+
+    1. 0. 0.
+    0. 1. 0.
+    0. 0. 1.
+
+
+   1. 1. 0.
+  -1. 1. 2.
+   1. -1. 1.
+
+
+    1. -1. 0.
+    1. 1. -2.
+    1. 1. 1.
+
+
+
+   1. 1. 0.
+  -1. 1. 2.
+   1. -1. 1.
+
+
+   1.  0. 0.
+   0.  1. 1.
+   0. -1. 1.
+
+For Boundary 10
+     0.7636 0.1314 -0.6322
+     0.5008 1.3958 0.895
+     1. -1. 1.
+
+For Boundary 21
+    0.8047,0.2824,-0.5223
+    0.2399,1.327,1.0871
+    1.,-1.,1.
+
+#comment
+      nface1(3) = 1 or 0: 1 = x,y,z-surface is free
+                          0 = Rigid
+      nface2(3) = 1 or 0: 1 = Reflected boundary
+                          0 = No reflection(free or rigid)
+
+

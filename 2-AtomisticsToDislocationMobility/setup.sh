@@ -66,6 +66,8 @@ cp "atoms.sh" "./test/RescaleUpload/"
 
 cp "datain" "../Calculations/0-Scripts/"
 cp "datain" "../Calculations/2-MDDP/"
+cp "data" "../Calculations/0-Scripts/"
+cp "data" "../Calculations/2-MDDP/"
 cp "MDDP_BCC_HW2.7z" "../Calculations/2-MDDP/"
 
 
