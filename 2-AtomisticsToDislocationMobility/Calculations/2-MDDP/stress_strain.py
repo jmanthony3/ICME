@@ -1,11 +1,8 @@
-from engineering_notation import EngNumber as engr
 import joby_m_anthony_iii.numerical_methods as nm
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
-import sympy as sp
-import sys
 import warnings
 warnings.filterwarnings(action="ignore", module="numpy/*", message="Empty input file", category=UserWarning)
 
