@@ -10,6 +10,7 @@
 
 
 
+set +x
 execution_dir=$(pwd)
 who=$(whoami)
 cd "1-ElectronicsToAtomistics/"
