@@ -46,7 +46,9 @@ mkdir "$OVITO_INSTALL_LOC"
 cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 cd "$OVITO_INSTALL_LOC"
 # Unzip with `tar xJfv ovito-X.X.X.tar.xz`.
-tar xJfv "$OVITO_VERSION.tar.xz"
+(set -x;
+    (tar xJfv "$OVITO_VERSION.tar.xz")> "$execution_dir/ovito_untar.log" 2>&1
+)
 
 # Update environment variables.
 echo "Updating environment variables for $who..."
