@@ -47,7 +47,7 @@ cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 cd "$OVITO_INSTALL_LOC"
 # Unzip with `tar xJfv ovito-X.X.X.tar.xz`.
 (set -x;
-    (tar xJfv "$OVITO_VERSION.tar.xz")> "$execution_dir/ovito_untar.log" 2>&1
+    (tar xJfv "$OVITO_VERSION.tar.xz")&> "$execution_dir/ovito_untar.log"
 )
 
 # Update environment variables.
