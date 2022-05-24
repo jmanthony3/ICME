@@ -42,7 +42,7 @@ cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
 (set -x;
     cd "q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
-    make all
+    make all %> "$execution_dir/quantum_espresso_make.log"
 )
 
 # set `pw.x` as environment variable change PATH as needed to QE `/bin/` folder
