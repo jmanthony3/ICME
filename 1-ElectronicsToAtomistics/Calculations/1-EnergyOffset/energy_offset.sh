@@ -127,7 +127,7 @@ gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
 python3 "EvA_EvV_plot.py" # generate plots
 
 # move all output files back to working directory
-mv "$reference_structure.ev.in" "../1-EnergyOffset/$reference_structure.ev.in"
+mv "$reference_structure.ev.in" "../1-EnergyOffset/"
 mv "evfit" "../1-EnergyOffset/"
 mv "EvsA" "../1-EnergyOffset/EvsA_offset"
 mv "EvsV" "../1-EnergyOffset/EvsV_offset"
