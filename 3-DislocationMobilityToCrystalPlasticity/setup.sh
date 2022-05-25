@@ -27,6 +27,7 @@ cp "rve.single.inp" "./test/RescaleUpload/"
 cp "texture.txti" "./test/RescaleUpload/"
 cp "umat_xtal.f" "./test/RescaleUpload/"
 cp "test.xtali" "./test/RescaleUpload/"
+cp "rescale_commands.sh" "./test/RescaleUpload/"
 
 ### populate "../Calculations/0-Scripts/" folder
 cp "rescale_commands.sh" "../Calculations/3-DislocationMobilityToCrystalPlasticity/0-Scripts/"
