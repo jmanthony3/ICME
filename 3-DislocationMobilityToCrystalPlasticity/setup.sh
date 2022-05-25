@@ -30,7 +30,7 @@ cp "test.xtali" "./test/RescaleUpload/"
 cp "rescale_commands.sh" "./test/RescaleUpload/"
 
 ### populate "../Calculations/0-Scripts/" folder
-cp "rescale_commands.sh" "../Calculations/3-DislocationMobilityToCrystalPlasticity/0-Scripts/"
+cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 
 
 
