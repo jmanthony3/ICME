@@ -45,6 +45,8 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 set +x # turn script tracing off
 
 
+
+######################### INPUT FILE ##########################
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -126,15 +128,15 @@ python3 "EvA_EvV_plot.py" # generate plots
 
 # move all output files back to working directory
 mv "$reference_structure.ev.in" "../1-EnergyOffset/$reference_structure.ev.in"
-mv "evfit" "../1-EnergyOffset/evfit"
+mv "evfit" "../1-EnergyOffset/"
 mv "EvsA" "../1-EnergyOffset/EvsA_offset"
 mv "EvsV" "../1-EnergyOffset/EvsV_offset"
 mv "SUMMARY" "../1-EnergyOffset/SUMMARY_offset"
-mv "evfit.4" "../1-EnergyOffset/evfit.4"
-mv "pw_ev.out" "../1-EnergyOffset/pw_ev.out"
-mv "Name_of_EvA.pdf" "../1-EnergyOffset/Name_of_EvA.pdf"
-mv "Name_of_EvV.pdf" "../1-EnergyOffset/Name_of_EvV.pdf"
-mv "Name_of_Combined.pdf" "../1-EnergyOffset/Name_of_Combined.pdf"
+mv "evfit.4" "../1-EnergyOffset/"
+mv "pw_ev.out" "../1-EnergyOffset/"
+mv "Name_of_EvA.pdf" "../1-EnergyOffset/"
+mv "Name_of_EvV.pdf" "../1-EnergyOffset/"
+mv "Name_of_Combined.pdf" "../1-EnergyOffset/"
 rm -r "temp/" # remove calculations temporary folder
 
 

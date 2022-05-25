@@ -138,16 +138,17 @@ K_POINTS (automatic)
         ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER
         python3 "EvA_EvV_plot.py" # generate plots
         # move all output files back to `cutoff_energy` directory
-        mv "$REFERENCE_STRUCTURE.ev.in" "../2-KPointStudy/$cutoff_energy/$REFERENCE_STRUCTURE.ev.in" # create appropriate input file to `ev_curve`
-        mv "evfit" "../2-KPointStudy/$cutoff_energy/evfit"
+        # create appropriate input file to `ev_curve`
+        mv "$REFERENCE_STRUCTURE.ev.in" "../2-KPointStudy/$cutoff_energy/"
+        mv "evfit" "../2-KPointStudy/$cutoff_energy/"
         mv "EvsA" "../2-KPointStudy/$cutoff_energy/EvsA.$cutoff_energy.$K"
         mv "EvsV" "../2-KPointStudy/$cutoff_energy/EvsV.$cutoff_energy.$K"
         mv "SUMMARY" "../2-KPointStudy/$cutoff_energy/SUMMARY.$cutoff_energy.$K"
-        mv "evfit.4" "../2-KPointStudy/$cutoff_energy/evfit.4"
-        mv "pw_ev.out" "../2-KPointStudy/$cutoff_energy/pw_ev.out"
-        mv "Name_of_EvA.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_EvA.pdf"
-        mv "Name_of_EvV.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_EvV.pdf"
-        mv "Name_of_Combined.pdf" "../2-KPointStudy/$cutoff_energy/Name_of_Combined.pdf"
+        mv "evfit.4" "../2-KPointStudy/$cutoff_energy/"
+        mv "pw_ev.out" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_EvA.pdf" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_EvV.pdf" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_Combined.pdf" "../2-KPointStudy/$cutoff_energy/"
         rm -r "temp/" # remove calculations temporary folder
 
         ### post-process output files
