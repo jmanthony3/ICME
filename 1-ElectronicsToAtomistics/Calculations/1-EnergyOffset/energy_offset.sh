@@ -5,7 +5,7 @@
 ######################### INPUT FILE ##########################
 ### define input file variables
 ELEMENT_NAME="Fe" # Periodic Table identifier of element
-ELEMENT_AMU=55.845 # literature value for element
+ELEMENT_AMU=55.845 # [g/mol], literature value for element
 PSEUDOPOTENTIAL_FILENAME="Fe.pbe-spn-kjpaw_psl.0.2.1.UPF"
 ELEMENT_POS=(
     0.00 # x
@@ -13,8 +13,8 @@ ELEMENT_POS=(
     0.00 # z
 )
 REFERENCE_STRUCTURE="bcc" # body-centered cubic
-LATTICE_PARAMETER=2.866 # angstrom, literature value for element
-CUTOFF_ENERGY=90
+LATTICE_PARAMETER=2.866 # [angstrom], literature value for element
+CUTOFF_ENERGY=90 # [Ry], make sufficiently large
 MAX_ITER=500
 MIXING_BETA=0.5
 KPOINT=12 # k-points for convergence
@@ -33,6 +33,7 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # - - - - - - - END OF HUMAN EDITABLE SECTION - - - - - - - - #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
@@ -40,7 +41,10 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
-set +x
+
+set +x # turn script tracing off
+
+
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -79,6 +83,7 @@ ATOMIC_POSITIONS (alat)
  $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
 K_POINTS (automatic)
  ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}""" > "$input_filename.in"
+# print input file to terminal
 echo "========== Contents of $input_filename.in =========="
 cat "$input_filename.in"
 echo "===================================================="
@@ -91,12 +96,12 @@ echo "Executing QE according to $input_filename.in..."
 (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out")
 
 
-### grab `total energy`, which is in Ry, from `.out` file
-energy_offset=$(
-    # grabs only the Ry value
+### grab `total energy`, which is in [Ry], from `.out` file
+energy_offset=$( # grabs only the [Ry] value
     sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | sed "s% Ry$%%"
 )
-energy_offset=$(echo "$energy_offset*-13.6057" | bc) # '*-13.6057' converts Ry to eV
+# '*-13.6057' converts [Ry] to [eV]
+energy_offset=$(echo "$energy_offset*-13.6057" | bc)
 echo "Energy offset found to be $energy_offset eV"
 
 
@@ -108,13 +113,18 @@ sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_
 
 
 ### run Fortran codes on input files
-cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in" # create appropriate input file to `ev_curve`
+# create appropriate input file to `ev_curve`
+cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in"
+
+# move to Scripts folder
 cd "../0-Scripts"
 gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
-chmod +x "ev_curve" # makes file executable
+# chmod +x "ev_curve" # makes file executable
 # this outputs `evfit.4`: reference structure, lattice parameter
 ./ev_curve $reference_structure $LATTICE_PARAMETER
 python3 "EvA_EvV_plot.py" # generate plots
+
+# move all output files back to working directory
 mv "$reference_structure.ev.in" "../1-EnergyOffset/$reference_structure.ev.in"
 mv "evfit" "../1-EnergyOffset/evfit"
 mv "EvsA" "../1-EnergyOffset/EvsA_offset"
@@ -125,7 +135,11 @@ mv "pw_ev.out" "../1-EnergyOffset/pw_ev.out"
 mv "Name_of_EvA.pdf" "../1-EnergyOffset/Name_of_EvA.pdf"
 mv "Name_of_EvV.pdf" "../1-EnergyOffset/Name_of_EvV.pdf"
 mv "Name_of_Combined.pdf" "../1-EnergyOffset/Name_of_Combined.pdf"
-rm -r "temp/"
+rm -r "temp/" # remove calculations temporary folder
+
+
+### post-process output files
+# move back to working directory
 cd "../1-EnergyOffset"
 declare -a inputs=(
     "EvsA_offset"
@@ -140,20 +154,31 @@ for input in "${inputs[@]}"; do
         energy=${elem[1]}
         offset_energy=$(echo "$energy+$energy_offset" | bc)
         sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
-        i=$(echo "$i+1" | bc)
-    done # end line `i`
+        i=$(echo "$i+1" | bc) # end line `i`
+    done # end of `input` file
     echo "Closing $input..."
-done # end of `input` file
+done # end of processing
+
+# adjust summary file
 echo "Adjusting summary files by $energy_offset eV..."
+# previous energy value
 energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY_offset")
+# offset energy value
 offset_energy=$(echo "$energy+$energy_offset" | bc)
+# replace energy value
 sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY_offset"
+# get lattice parameter [angstrom]
 lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY_offset")
+# previous bulk modulus [kbar]
 bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY_offset")
+# convert to [GPa]
 bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
+# replace bulk modulus
 sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY_offset"
 
+# print summary file to terminal
 cat "SUMMARY_offset"
+
 
 
 

@@ -2,12 +2,14 @@
 
 
 
+#################### INSTALLATION VARIABLES ###################
 # define install path for Quantum Espresso (QE)
 QUANTUM_ESPRESSO_INSTALL_LOC=~/QuantumEspresso
 # encode name and version of tarball: qe-X.X.X
 QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
 # number of processors to use in test case
 NUM_PROC=$(nproc) # grabs all cores available by default
+
 
 
 
@@ -19,10 +21,14 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
-set +x
-execution_dir=$(pwd)
-who=$(whoami)
 
+set +x # turn script tracing off
+execution_dir=$(pwd) # where script executes from
+who=$(whoami) # current user
+
+
+
+####################### INSTALL SOFTWARE ######################
 ### installing quantum espresso
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
 echo "Updating distro and including cmake, gcc, gfortran, and make..."
@@ -31,58 +37,63 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
     sudo apt install build-essential
 )
 
-# copy/paste the `Files/qe-X.X.X.tar.gz` archive into a working directory
+# copy tarball into installation directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
 cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/"
+
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 echo "+ cd $QUANTUM_ESPRESSO_INSTALL_LOC"
 echo "+ tar -xzvf $QUANTUM_ESPRESSO_VERSION.tar.gz"
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
-)&> "$execution_dir/quantum_espresso_untar.log"
+)&> "$execution_dir/quantum_espresso_untar.log" # write execution log
 
 # `cd` into that extracted folder and execute `./configure && make all`
 (set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION")
 echo "+ ./configure"
+# write execution log
 (set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && ./configure)&> "$execution_dir/quantum_espresso_configure.log"
 echo "+ make all"
+# write execution log
 (set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && make all)&> "$execution_dir/quantum_espresso_make.log"
 
-# set `pw.x` as environment variable change PATH as needed to QE `/bin/` folder
+# set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
+echo "Setting 'pw.x' as environment variable..."
 echo "export PATH=\"$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION/bin:\$PATH\"" >> ~/.bashrc
 
-# Update environment variables.
+# update environment variables for user
 echo "Updating environment variables for $who..."
-(set -x;
-    source ~/.bashrc
-    # sleep 5s
-    # pw.x --version
-)
-
+(set -x; source ~/.bashrc)
 
 
 ### test execution of `EvA_EvV_plot.py`
+# for mpi dependency
 echo "Installing by 'sudo apt' only for mpi dependencies..."
 (set -x; sudo apt install quantum-espresso)
+
+# navigate back to appropriate directory
 cd "$execution_dir/Files"
-mkdir "test"
+mkdir "test" # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
-    # executes the input parameters with QE
+    # execute QE with input parameters
     mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out"
     # compiles `evfit.f` outputs `ev_curve`
     gfortran -O2 "evfit.f" -o "evfit"
 )
+
+# create EvsA and EvsV curves
 cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
-chmod +x ./ev_curve # makes file executable
+# chmod +x ./ev_curve # makes file executable
 (set -x; ./ev_curve fcc 3.628) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
-    sudo apt install python3-pip
-    python3 -m pip install matplotlib numpy
+    sudo apt install python3-pip # install pip3
+    python3 -m pip install matplotlib numpy # install modules
     python3 "EvA_EvV_plot.py" # generate plots
 )
+# move (in/out)put files to `./test/`
 mv "evfit" "./test/"
 mv "fcc.ev.in" "./test/"
 mv "EvsA" "./test/"
@@ -94,11 +105,11 @@ mv "Name_of_EvV.pdf" "./test/"
 mv "Name_of_Combined.pdf" "./test/"
 mv "evfit.4" "./test/"
 mv "pw_ev.out" "./test/"
-rm -r "temp/"
-
+rm -r "temp/" # remove calculations temporary folder
 
 
 ### test execution of `gsfe_curve.py`
+# install python2
 echo "Installing Python 2..."
 (set -x;
     sudo add-apt-repository universe
@@ -110,20 +121,20 @@ echo "Installing Python 2..."
     pip2 --version
     pip2 install numpy
 )
-# reference structure, lattice parameter, and block motion
+# python2 gsfe_curve.py: reference structure, lattice parameter, block motion
 (set -x; python2 "gsfe_curve.py" fcc 3.615 partial &)
-sleep 5s
-pid=$(pgrep pw.x)
+sleep 10s # let previous process spin up
+pid=$(pgrep pw.x) # get pid of `pw.x` process
 echo "Killing the 'gsfe_curve.py' process ('PID=$pid') because this will take too long..."
 kill $pid
-mv "gsfe.in" "./test/gsfe.in"
-mv "gsfe.out" "./test/gsfe.out"
-mv "GSFE_SUMMARY" "./test/GSFE_SUMMARY"
-rm -r "temp/"
+# move (in/out)put files to `./test/`
+mv "gsfe.in" "./test/"
+mv "gsfe.out" "./test/"
+mv "GSFE_SUMMARY" "./test/"
+rm -r "temp/" # remove calculations temporary folder
 
 
-
-### populate "../Calculations/0-Scripts/" folder
+### populate `../Calculations/0-Scripts/`
 cp "ev_curve" "../Calculations/0-Scripts/"
 cp "EvA_EvV_plot.py" "../Calculations/0-Scripts/"
 cp "evfit.f" "../Calculations/0-Scripts/"

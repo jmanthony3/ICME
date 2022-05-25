@@ -2,13 +2,15 @@
 
 
 
-######################### `atom-dislocation` ##########################
+##################### `atom-dislocation` ######################
 ### define file variables and command line arguments
-# reference structure
-# 1) FCC 2) BCC 3) HCP
+## reference structure
+# 1) FCC
+# 2) BCC
+# 3) HCP
 REFERENCE_STRUCTURE="fcc" # crystal structure
 
-# element name
+## element name
 # 1) FCC
 #       1) Ni
 #       2) Cu
@@ -28,18 +30,24 @@ ELEMENT_NAME="Cu" # Periodic Table identifier of element
 
 ELEMENT_NUM="40 20 2" # number of `ELEMENT_NAME` atoms in x, y, z directions
 
-# dislocation type
+## dislocation type
+# edge
+# screw
 DISLOCATION_TYPE="Edge" # edge or screw
 
-# structure type
-STRUCTURE_TYPE="PAD" # 1) cylinder; 2) PAD; 3) Perfect FCC crystal
+## structure type
+# 1) cylinder
+# 2) PAD
+# 3) Perfect FCC crystal
+STRUCTURE_TYPE="PAD"
 
 # define according to: seq FIRST STEP LAST
-declare -a TEMP=(300) # ($(seq 150 50 500))        # desired temperature
+declare -a TEMP=(300) # ($(seq 150 50 500)) # desired temperature [K]
 # define according to: seq FIRST STEP LAST
-declare -a SIGMA=($(seq 25 25 300))          # applied stress in MPa
-equilTime=10000     # number of increment to equilibrate the temperature
-runTime=100000      # number of increment to calibrate the velocity
+declare -a SIGMA=($(seq 25 25 300)) # applied stress [MPa]
+equilTime=10000 # number of increment to equilibrate the temperature
+runTime=100000 # number of increment to calibrate the velocity
+
 
 
 
@@ -51,9 +59,13 @@ runTime=100000      # number of increment to calibrate the velocity
 
 
 
-set +x
-### collect arguments into single tuple
-ATOM_DISLOCATION_ARGUMENTS=(
+
+set +x # turn script tracing off
+
+
+
+######################### ATOMISTICS ##########################
+ATOM_DISLOCATION_ARGUMENTS=( # collect arguments into single tuple
     $REFERENCE_STRUCTURE # 0
     $ELEMENT_NAME # 1
     $ELEMENT_NUM # 2
@@ -61,10 +73,10 @@ ATOM_DISLOCATION_ARGUMENTS=(
     $STRUCTURE_TYPE # 4
 )
 for temp in "${TEMP[@]}"; do
-    mkdir "./$temp"
+    mkdir "$temp" # make directory for temperature
     for sigma in "${SIGMA[@]}"; do
+        # convert [MPa] tp [bar]
         sigma_bar=$(echo "scale=9; $sigma/1000*10" | bc)
-
 
         ### modify arguments tuple to replace strings with integer selections
         # reference structure selection
@@ -96,6 +108,7 @@ for temp in "${TEMP[@]}"; do
             echo "Variable ELEMENT_NAME=$ELEMENT_NAME not understood."
             exit
         fi
+        # dislocation type selection
         dislocation_type=$(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]')
         if [[ $dislocation_type == "edge" ]]; then
             ATOM_DISLOCATION_ARGUMENTS[3]="1"
@@ -105,6 +118,7 @@ for temp in "${TEMP[@]}"; do
             echo "Variable DISLOCATION_TYPE=$DISLOCATION_TYPE not understood. Must be either 'edge' or 'screw'."
             exit
         fi
+        # structure type selection
         structure_type=$(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]')
         if [[ $structure_type == "cylinder" ]]; then
             ATOM_DISLOCATION_ARGUMENTS[4]="1"
@@ -116,57 +130,52 @@ for temp in "${TEMP[@]}"; do
             echo "Variable STRUCTURE_TYPE=$STRUCTURE_TYPE not understood. Must be either 'cylinder', 'PAD' or 'Perfect FCC crystal'."
             exit
         fi
-
-
+        # compile `atom-dislocation` script
         (set -x; gfortran -O3 "Dislocation.f90" -o "atom-dislocation")
-        # generates atom.`REFERENCE_STRUCTURE`.`DISLOCATION_TYPE`.`STRUCTURE_TYPE` file
+        # generates atoms.`REFERENCE_STRUCTURE`.`DISLOCATION_TYPE`.`STRUCTURE_TYPE` file
+        echo "Ignore consequent errors..."
         (set -x; ./atoms.sh ${ATOM_DISLOCATION_ARGUMENTS[0]} ${ATOM_DISLOCATION_ARGUMENTS[1]} $ELEMENT_NUM ${ATOM_DISLOCATION_ARGUMENTS[3]} ${ATOM_DISLOCATION_ARGUMENTS[4]})
 
-
-        ### ignore consequent errors
-
-
+        ### modify `atom-dislocation` script
+        # determine if encoded temperature is of type float or int
         if [[ $temp =~ ^[+-]?[0-9]*\.[0-9]+$ ]]
         then
             sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp%" "./DisVelocity.in"
         else
             sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp.%" "./DisVelocity.in"
-        fi
-
+        fi # should be float
+        # determine if encoded stress is of type float or int
         if [[ $sigma_bar =~ ^[+-]?[0-9]*\.[0-9]+$ ]]
         then
             sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar%" "./DisVelocity.in"
         else
             sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar.%" "./DisVelocity.in"
-        fi
-
+        fi # should be float
+        # update other variables
         sed -i "s%^variable material string [[:alpha:]]*[^[:blank:]#]*%variable material string $ELEMENT_NAME%" "./DisVelocity.in"
-
-        sed -i "s%^variable atom_file string atoms[\.[[:alpha:]]]*[^[:blank:]#]*%variable atom_file string atoms.$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]').$(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]').$(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]')%" "./DisVelocity.in"
-
+        sed -i "s%^variable atom_file string atoms[\.[[:alpha:]]]*[^[:blank:]#]*%variable atom_file string atoms.$reference_structure.$dislocation_type.$structure_type%" "./DisVelocity.in"
         sed -i "s%^variable equilTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable equilTime equal $equilTime%" "./DisVelocity.in"
-
         sed -i "s%^variable runTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable runTime equal $runTime%" "./DisVelocity.in"
 
-
-
-        # run LAMMPS
+        ### execute LAMMPS with input parameters
         nohup mpirun -np 50 lmp_rescale-amd-userlib -in "./DisVelocity.in"
 
-        # post-process LAMMPS
-        mkdir "./$temp/$sigma"
-        mv "./atom-dislocation" "./$temp/$sigma/atom-dislocation"
-        mv "./atoms.$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]').$(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]').$(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]')" "./$sigma/atoms.$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]').$(echo $DISLOCATION_TYPE | tr '[:upper:]' '[:lower:]').$(echo $STRUCTURE_TYPE | tr '[:upper:]' '[:lower:]')"
-        cp "./DisVelocity.in" "./$temp/$sigma/DisVelocity.in"
-        mv "./dump.equilibration" "./$temp/$sigma/dump.equilibration"
-        mv "./dump.minimize" "./$temp/$sigma/dump.minimize"
-        mv "./dump.shear" "./$temp/$sigma/dump.shear"
-        mv "./dump.shear.unwrap" "./$temp/$sigma/dump.shear.unwrap"
-        mv "./log.lammps" "./$temp/$sigma/log.lammps"
-    done # finish `sigma`
-done # finish `temp`
+        ### post-process LAMMPS
+        mkdir "$temp/$sigma"
+        mv "atom-dislocation" "./$temp/$sigma/"
+        mv "atoms.$reference_structure.$dislocation_type.$structure_type" "./$temp/$sigma/"
+        cp "DisVelocity.in" "./$temp/$sigma/"
+        mv "dump.equilibration" "./$temp/$sigma/"
+        mv "dump.minimize" "./$temp/$sigma/"
+        mv "dump.shear" "./$temp/$sigma/"
+        mv "dump.shear.unwrap" "./$temp/$sigma/"
+        mv "log.lammps" "./$temp/$sigma/"
+        # finish `sigma`
+    done # finish `temp`
+done # finish atomistics
 
 
 
 
-# end of file
+
+# that's all folks

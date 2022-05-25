@@ -2,6 +2,12 @@
 
 
 
+####################### MEAM PARAMETERS #######################
+ELEMENT_NAME="Fe" # Periodic Table identifier of element
+
+
+
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # - - - - - - - END OF HUMAN EDITABLE SECTION - - - - - - - - #
@@ -10,22 +16,24 @@
 
 
 
-set +x
-rm -r "RescaleUpload/"
-mkdir "RescaleUpload"
-mkdir "RescaleDownload"
-mkdir "PositionFrameData"
-cd "../0-Scripts/"
-cp "Cu.meam" "../1-DislocationVelocity/RescaleUpload/"
-cp "Dislocation.f90" "../1-DislocationVelocity/RescaleUpload/"
-cp "DisVelocity.in" "../1-DislocationVelocity/RescaleUpload/"
-cp "library.meam" "../1-DislocationVelocity/RescaleUpload/"
-cp "rescale_commands.sh" "../1-DislocationVelocity/RescaleUpload/"
-cp "atoms.sh" "../1-DislocationVelocity/RescaleUpload/"
 
-(set -x; python3 -m pip install engineering_notation joby_m_anthony_iii pandas sympy)
+set +x # turn script tracing off
 
 
 
+###################### CREATE ENVIRONMENT #####################
+rm -r "RescaleUpload/" || mkdir "RescaleUpload"
+mkdir "RescaleDownload"; mkdir "PositionFrameData"
+# copy input files to `RescaleUpload/`
+cp "../0-Scripts/$ELEMENT_NAME.meam" "./RescaleUpload/"
+cp "../0-Scripts/Dislocation.f90" "./RescaleUpload/"
+cp "../0-Scripts/DisVelocity.in" "./RescaleUpload/"
+cp "../0-Scripts/library.meam" "./RescaleUpload/"
+cp "../0-Scripts/rescale_commands.sh" "./RescaleUpload/"
+cp "../0-Scripts/atoms.sh" "./RescaleUpload/"
 
-# end of file
+
+
+
+
+# that's all folks

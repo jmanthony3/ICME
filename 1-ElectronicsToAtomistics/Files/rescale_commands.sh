@@ -3,6 +3,7 @@
 
 
 
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 # - - - - - - - END OF HUMAN EDITABLE SECTION - - - - - - - - #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
@@ -10,25 +11,36 @@
 
 
 
-set +x
-rm "inputs.txt"
+
+set +x # turn script tracing off
+
+
+
+##################### CALCULATE GSFE CURVE ####################
+### glob list of `gsfe_*.in` files
 touch "inputs.txt"
-# process for each file
-for input in gsfe_*.in; do
-    echo "$input" >> "inputs.txt"
-done
-declare -a gsfes=()
+for input in gsfe_*.in; do # process for each file
+    echo "$input" >> "inputs.txt" # append list
+done # end list definition
+
+
+### glob numbers from list of `gsfe_*.in` files
+declare -a gsfes=() # start with empty tuple
 for line in "inputs.txt"; do
     read -a elem <<< "$line"
     name=${elem[0]}
-    gsfes+=($(sed -n "s%.in%%p" "$name"))
-done
-rm "inputs.txt"
+    gsfes+=($(sed -n "s%.in%%p" "$name")) # append tuple
+done # end of tuple definition
+rm "inputs.txt" # remove temporary list
+
+
+### execute QE with input parameters
 for gsfe in ${gsfes[@]}; do
-    mpirun -np 16 pw.x -in $gsfe.in > $gsfe.out
+    (set -x; mpirun -np 16 pw.x -in $gsfe.in > $gsfe.out)
 done
 
 
 
 
-# end of file
+
+# that's all folks

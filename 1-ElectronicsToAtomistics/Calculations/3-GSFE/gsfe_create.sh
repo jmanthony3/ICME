@@ -5,7 +5,7 @@
 ######################### INPUT FILE ##########################
 ### define input file variables
 ELEMENT_NAME="Fe" # Periodic Table identifier of element
-ELEMENT_AMU=55.845 # literature value for element
+ELEMENT_AMU=55.845 # [g/mol], literature value for element
 PSEUDOPOTENTIAL_FILENAME="Fe.pbe-spn-kjpaw_psl.0.2.1.UPF"
 ELEMENT_POS=(
     0.00 # x
@@ -13,8 +13,8 @@ ELEMENT_POS=(
     0.00 # z
 )
 REFERENCE_STRUCTURE="bcc" # body-centered cubic
-LATTICE_PARAMETER=2.866 # angstrom, literature value for element
-CUTOFF_ENERGY=64 # Ry
+LATTICE_PARAMETER=2.866 # [angstrom], literature value for element
+CUTOFF_ENERGY=64 # [Ry]
 MAX_ITER=500
 MIXING_BETA=0.5
 KPOINT=8 # k-points for convergence
@@ -41,12 +41,13 @@ EQ_OF_STATE=4
 
 
 ####################### `EvA_EvV_plot.py` #####################
-ENERGY_OFFSET=4479.41619611 # Ry
+ENERGY_OFFSET=4479.41619611 # [Ry]
 
 
 
 ##################### `OutputFileCreator.py` ##################
 DISLOCATION_GRADE="full"
+
 
 
 
@@ -58,7 +59,12 @@ DISLOCATION_GRADE="full"
 
 
 
-set +x
+
+set +x # turn script tracing off
+
+
+
+######################## MODIFY SCRIPTS #######################
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -122,7 +128,7 @@ else
     exit
 fi
 
-# modify script
+# modify `OutputFileCreator.py` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputFileCreator.py"
@@ -132,7 +138,7 @@ sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" "../0-Scripts/Output
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
 
-# modify script
+# modify `OutputSummarizer.py` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputSummarizer.py"
 sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputSummarizer.py"
 sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputSummarizer.py"
@@ -144,7 +150,7 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 
 
 
-###################### GENERATE 3-GSFE DATA #####################
+###################### GENERATE GSFE DATA #####################
 # ### execute QE with input parameters
 # echo "Executing QE according to $input_filename.in..."
 # (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$ELEMENT_NAME.out")
@@ -201,14 +207,25 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 
 # cat "SUMMARY"
 
-rm -r "RescaleUpload/"
-mkdir "RescaleUpload"
+
+### create Rescale(Up/Down)load structure
+# make `RescaleUpload/` folder from inputs
+rm -r "RescaleUpload/" || mkdir "RescaleUpload"
+# make `RescaleDownload/` folder for outputs
 mkdir "RescaleDownload"
+# move into Scripts directory
 cd "../0-Scripts/"
-mkdir "input_gens"
-# reference structure, lattice parameter, and block motion
-python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade
+mkdir "input_gens" # subsequent script places inputs here
+# python2 OutputFileCreator.py: reference structure, lattice parameter, block motion
+(set -x; python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade)
+# move (in/out)put files to `../3-GSFE/RescaleUpload/`
 mv "input_gens/"* "../3-GSFE/RescaleUpload/"
 rm -r "input_gens/"
 rm "RE_comm.cm" "gsfe.in" "GSFE_SUMMARY"
-cp "rescale_commands.sh" "../3-GSFE/RescaleUpload/rescale_commands.sh"
+cp "rescale_commands.sh" "../3-GSFE/RescaleUpload/"
+
+
+
+
+
+# that's all folks

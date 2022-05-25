@@ -5,7 +5,7 @@
 ######################### INPUT FILE ##########################
 ### define input file variables
 ELEMENT_NAME="Fe" # Periodic Table identifier of element
-ELEMENT_AMU=55.845 # literature value for element
+ELEMENT_AMU=55.845 # [g/mol], literature value for element
 PSEUDOPOTENTIAL_FILENAME="Fe.pbe-spn-kjpaw_psl.0.2.1.UPF"
 ELEMENT_POS=(
     0.00 # x
@@ -13,8 +13,8 @@ ELEMENT_POS=(
     0.00 # z
 )
 REFERENCE_STRUCTURE="bcc" # body-centered cubic
-LATTICE_PARAMETER=2.866 # angstrom, literature value for element
-CUTOFF_ENERGY=64 # Ry
+LATTICE_PARAMETER=2.866 # [angstrom], literature value for element
+CUTOFF_ENERGY=64 # [Ry]
 MAX_ITER=500
 MIXING_BETA=0.5
 KPOINT=8 # k-points for convergence
@@ -41,12 +41,13 @@ EQ_OF_STATE=4
 
 
 ####################### `EvA_EvV_plot.py` #####################
-ENERGY_OFFSET=4479.41619611 # Ry
+ENERGY_OFFSET=4479.41619611 # [Ry]
 
 
 
 ##################### `OutputFileCreator.py` ##################
 DISLOCATION_GRADE="full"
+
 
 
 
@@ -58,7 +59,12 @@ DISLOCATION_GRADE="full"
 
 
 
-set +x
+
+set +x # turn script tracing off
+
+
+
+######################## MODIFY SCRIPTS #######################
 ### automatically define other `.in` file variables from inputs
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then
@@ -123,7 +129,7 @@ else
     exit
 fi
 
-# modify script
+# modify `OutputFileCreator.py` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputFileCreator.py"
@@ -133,7 +139,7 @@ sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" "../0-Scripts/Output
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
 sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
 
-# modify script
+# modify `OutputSummarizer.py` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputSummarizer.py"
 sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputSummarizer.py"
 sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputSummarizer.py"
@@ -145,7 +151,7 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 
 
 
-###################### GENERATE 3-GSFE DATA #####################
+###################### GENERATE GSFE DATA #####################
 # ### execute QE with input parameters
 # echo "Executing QE according to $input_filename.in..."
 # (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$ELEMENT_NAME.out")
@@ -197,13 +203,18 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 # bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
 # sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY"
 
-cp "RescaleDownload/gsfe_"*".out" "../0-Scripts"
 
+
+### post-process output files from Rescale
+cp "RescaleDownload/gsfe_"*".out" "../0-Scripts"
+# move into Scripts directory
 cd "../0-Scripts"
-# reference structure, lattice parameter, and block motion
+# python2 OutputSummarizer.py: reference structure, lattice parameter, block motion
 python2 "OutputSummarizer.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade
-mv "GSFE_SUMMARY" "../3-GSFE/GSFE_SUMMARY"
+# move (in/out)put files to `../3-GSFE/`
+mv "GSFE_SUMMARY" "../3-GSFE/"
 rm "gsfe.in" "gsfe_"*".out"
+# move to GSFE directory
 cd "../3-GSFE"
 declare -a inputs=(
     "GSFE_SUMMARY"
@@ -216,9 +227,10 @@ for input in "${inputs[@]}"; do
         energy=${elem[1]}
         scaled_energy=$(echo "scale=9; $energy/$lattice_area" | bc)
         sed -i "${i}s%[[:space:]]\-*[[:digit:]]*\.[[:digit:]]*%\t$scaled_energy%" "$input"
-        i=$(echo "$i+1" | bc)
-    done
-done
+        i=$(echo "$i+1" | bc) # end of line `i`
+    done # end of `input` file
+done # end of processing
+# copy to another file for posterity
 cp "GSFE_SUMMARY" "GSFE_SUMMARY-Calibration"
 declare -a inputs=(
     "GSFE_SUMMARY-Calibration"
@@ -228,11 +240,18 @@ for input in "${inputs[@]}"; do
     readarray file < $input
     for line in "${file[@]}"; do
         read -a elem <<< "$line"
-        displacement=${elem[0]}
+        displacement=${elem[0]} # displacement along unit vector
+        # scale displacement to lattice parameter [angstrom]
         scaled_displacement=$(echo "$displacement*$LATTICE_PARAMETER" | bc)
         sed -i "${i}s%^[[:digit:]]*\.[[:digit:]]*\t%$scaled_displacement\t%" "$input"
-        sed -i "${i}s%\t${elem[2]} %%" "$input"
-        i=$(echo "$i+1" | bc)
-    done
-    sed -i "s%\t% %" "$input"
-done
+        sed -i "${i}s%\t${elem[2]} %%" "$input" # MPC does not need this column
+        i=$(echo "$i+1" | bc) # end of line `i`
+    done # end of `input` file
+    sed -i "s%\t% %" "$input" # replace tabs with spaces
+done # end of processing
+
+
+
+
+
+# that's all folks
