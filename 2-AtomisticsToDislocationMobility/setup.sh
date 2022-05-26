@@ -109,7 +109,7 @@ wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-6/libgfortran3_6.4.0-1
 sudo dpkg -i libgfortran3_6.4.0-17ubuntu1_amd64.deb # install library
 
 (set -x;
-    sudo apt install p7zip-full # get `7z` package
+    sudo apt-get install p7zip-full # get `7z` package
     7z x "MDDP.7z" # unarchive
 )
 # move into unarchived MDDP folder

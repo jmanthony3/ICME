@@ -34,8 +34,8 @@ mkdir "$execution_dir/logs"
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
 echo "Updating distro and including cmake, gcc, gfortran, and make..."
 (set -x;
-    sudo apt update
-    sudo apt install build-essential
+    sudo apt-get update
+    sudo apt-get install build-essential
 )
 
 # copy tarball into installation directory
@@ -78,8 +78,8 @@ echo "Updating environment variables for $who..."
 
 ### test execution of `EvA_EvV_plot.py`
 # for mpi dependency
-echo "Installing by 'sudo apt' only for mpi dependencies..."
-(set -x; sudo apt install quantum-espresso)
+echo "Installing by 'sudo apt-get' only for mpi dependencies..."
+(set -x; sudo apt-get install quantum-espresso)
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
@@ -97,7 +97,7 @@ cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
 (set -x; ./ev_curve fcc 3.628) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
-    sudo apt install python3-pip # install pip3
+    sudo apt-get install python3-pip # install pip3
     python3 -m pip install matplotlib numpy # install modules
     python3 "EvA_EvV_plot.py" # generate plots
 )
@@ -121,9 +121,9 @@ rm -r "temp/" # remove calculations temporary folder
 echo "Installing Python 2..."
 (set -x;
     sudo add-apt-repository universe
-    sudo apt update
-    sudo apt install python2
-    sudo apt install curl
+    sudo apt-get update
+    sudo apt-get install python2
+    sudo apt-get install curl
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
     sudo python2 get-pip.py
     pip2 --version
