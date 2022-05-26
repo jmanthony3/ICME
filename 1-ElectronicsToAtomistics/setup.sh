@@ -55,7 +55,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
-) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5813 > "$execution_dir/logs/quantum_espresso_configure.log"
+) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 29325 > "$execution_dir/logs/quantum_espresso_configure.log"
 # show progress of make and write log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
