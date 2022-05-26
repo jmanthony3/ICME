@@ -48,18 +48,18 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
-) | pv -pterb --size 257353 &> "$execution_dir/logs/quantum_espresso_untar.log"
+) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257353 > "$execution_dir/logs/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure && make all`
 # show progress of configure and write log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
-) | pv -pterb --size 5813 &> "$execution_dir/logs/quantum_espresso_configure.log"
+) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5813 > "$execution_dir/logs/quantum_espresso_configure.log"
 # show progress of make and write log
 (set -x;
     make all
-) | pv -pterb --size 752541 &> "$execution_dir/logs/quantum_espresso_make.log"
+) 2> "$execution_dir/logs/quantum_espresso_make.log" | pv -pterb --size 752541 > "$execution_dir/logs/quantum_espresso_make.log"
 
 # set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
 echo "Setting 'pw.x' as environment variable..."

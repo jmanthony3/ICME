@@ -59,7 +59,7 @@ cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 (set -x;
     cd "$OVITO_INSTALL_LOC"
     tar xJfv "$OVITO_VERSION.tar.xz"
-) | pv -pterb --size 82293 &> "$execution_dir/logs/ovito_untar.log"
+) 2> "$execution_dir/logs/ovito_untar.log" | pv -pterb --size 82293 >"$execution_dir/logs/ovito_untar.log"
 
 # set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
 echo "Setting 'ovito' as environment variable..."
