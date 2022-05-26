@@ -55,12 +55,11 @@ mkdir "$execution_dir/logs"
 mkdir "$OVITO_INSTALL_LOC"
 cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 # unzip with `tar xJfv ovito-basic-X.X.X-*.tar.xz`
-echo "+ cd $OVITO_INSTALL_LOC"
-echo "+ tar xJfv $OVITO_VERSION.tar.xz"
+# show progress of untar and write log
 (set -x;
     cd "$OVITO_INSTALL_LOC"
     tar xJfv "$OVITO_VERSION.tar.xz"
-)&> "$execution_dir/logs/ovito_untar.log" # write execution log
+) | pv -pterb --size 82293 > "$execution_dir/logs/ovito_untar.log"
 
 # set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
 echo "Setting 'ovito' as environment variable..."

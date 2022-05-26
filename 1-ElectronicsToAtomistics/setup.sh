@@ -46,26 +46,26 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 echo "+ cd $QUANTUM_ESPRESSO_INSTALL_LOC"
 echo "+ tar -xzvf $QUANTUM_ESPRESSO_VERSION.tar.gz"
-# write execution log
+# show progress of untar and write log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
-)&> "$execution_dir/logs/quantum_espresso_untar.log"
+) | pv -pterb --size 257353 > "$execution_dir/logs/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure && make all`
 (set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION")
 echo "+ ./configure"
-# write execution log
+# show progress of configure and write log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
-)&> "$execution_dir/logs/quantum_espresso_configure.log"
+) | pv -pterb --size 5813 > "$execution_dir/logs/quantum_espresso_configure.log"
 echo "+ make all"
-# write execution log
+# show progress of make and write log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     make all
-)&> "$execution_dir/logs/quantum_espresso_make.log"
+) | pv -pterb --size 752541 &> "$execution_dir/logs/quantum_espresso_make.log"
 
 # set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
 echo "Setting 'pw.x' as environment variable..."

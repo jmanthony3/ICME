@@ -21,26 +21,26 @@ mkdir "$execution_dir/logs"
 
 ########################### BRIDGES ###########################
 ### setup bridges
+# make sure distro is current
+(set -x; sudo apt-get update)
+
 # bridge: 1
 echo "Setting up '1-ElectronicsToAtomistics' bridge..."
 echo "+ $execution_dir/1-ElectronicsToAtomistics/setup.sh"
 cd "$execution_dir/1-ElectronicsToAtomistics"
-pv -p --timer --rate --bytes | # show progress of bridge setup
-    (set -x; ./setup.sh) &>"$execution_dir/logs/1-ElectronicsToAtomistics.log"
+(set -x; ./setup.sh) | tee "$execution_dir/logs/1-ElectronicsToAtomistics.log"
 
 # bridge: 2
 clear; echo "Setting up '2-AtomisticsToDislocationMobility' bridge..."
 echo "+ $execution_dir/2-AtomisticsToDislocationMobility/setup.sh"
 cd "$execution_dir/2-AtomisticsToDislocationMobility"
-pv -p --timer --rate --bytes | # show progress of bridge setup
-    (set -x; ./setup.sh) &>"$execution_dir/logs/2-AtomisticsToDislocationMobility.log"
+(set -x; ./setup.sh) | tee "$execution_dir/logs/2-AtomisticsToDislocationMobility.log"
 
 # bridge: 3
 clear; echo "Setting up '3-DislocationMobilityToCrystalPlasticity' bridge..."
 echo "+ $execution_dir/3-DislocationMobilityToCrystalPlasticity"
 cd "$execution_dir/3-DislocationMobilityToCrystalPlasticity"
-pv -p --timer --rate --bytes | # show progress of bridge setup
-    (set -x; ./setup.sh) &>"$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity.log"
+(set -x; ./setup.sh) | tee "$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity.log"
 
 clear; echo "Done."
 
