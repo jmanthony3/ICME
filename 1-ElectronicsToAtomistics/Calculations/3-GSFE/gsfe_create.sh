@@ -72,10 +72,12 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     ibrav=3
 else
-    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
+    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
+        not understood. Must be either 'fcc' or 'bcc'."
     exit
 fi
 # echo "Based on $reference_structure, ibrav=$ibrav"
+# '*1.88973' converts [angstrom] to [bohr]
 # lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l) # bohr
 # input_filename=$ELEMENT_NAME # name input file
 
@@ -112,7 +114,8 @@ sed -i "64s%^[[:digit:]]*[^ #]*%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
 ### automatically define other `EvA_EvV_plot.py` file variables from inputs
-sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" "../0-Scripts/EvA_EvV_plot.py"
+sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" \
+    "../0-Scripts/EvA_EvV_plot.py"
 
 
 ### automatically define other `OutputFileCreator.py` file variables from inputs
@@ -124,29 +127,46 @@ elif [[ "$dislocation_grade" == "longpartial" ]]; then
 elif [[ "$dislocation_grade" == "partial" ]]; then
     disp_scale=$(echo "scale=9; 1" | bc)
 else
-    echo "Variable DISLOCATION_GRADE=$DISLOCATION_GRADE not understood. Must be either 'full', 'longpartial', or 'partial'."
+    echo "Variable DISLOCATION_GRADE=$DISLOCATION_GRADE \
+        not understood. Must be either 'full', 'longpartial', or 'partial'."
     exit
 fi
 
 # modify `OutputFileCreator.py` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
-sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
+    "../0-Scripts/OutputFileCreator.py"
+sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" \
+    "../0-Scripts/OutputFileCreator.py"
 
 # modify `OutputSummarizer.py` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" "../0-Scripts/OutputSummarizer.py"
-sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
+    "../0-Scripts/OutputSummarizer.py"
+sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" \
+    "../0-Scripts/OutputSummarizer.py"
 
 
 
@@ -216,8 +236,10 @@ mkdir "RescaleDownload"
 # move into Scripts directory
 cd "../0-Scripts/"
 mkdir "input_gens" # subsequent script places inputs here
-# python2 OutputFileCreator.py: reference structure, lattice parameter, block motion
-(set -x; python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade)
+(set -x;
+    # python2 OutputFileCreator.py: reference structure, lattice parameter, block motion
+    python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade
+)
 # move (in/out)put files to `../3-GSFE/RescaleUpload/`
 mv "input_gens/"* "../3-GSFE/RescaleUpload/"
 rm -r "input_gens/"

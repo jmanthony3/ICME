@@ -3,7 +3,7 @@
 
 
 ########################### `*.sx` ############################
-REFERENCE_STRUCTURE="fcc" # crystal structure
+REFERENCE_STRUCTURE="bcc" # crystal structure
 
 
 
@@ -37,7 +37,8 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     cp "bcc.sx" "./test/RescaleUpload/"
 else
-    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
+    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
+        not understood. Must be either 'fcc' or 'bcc'."
     exit
 fi
 cp "numbers.inc" "./test/RescaleUpload/"

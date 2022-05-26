@@ -29,6 +29,7 @@ ELEMENT_NAME="Fe" # Periodic Table identifier of element
 set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
 who=$(whoami) # current user
+mkdir "$execution_dir/logs"
 
 
 
@@ -59,7 +60,7 @@ echo "+ tar xJfv $OVITO_VERSION.tar.xz"
 (set -x;
     cd "$OVITO_INSTALL_LOC"
     tar xJfv "$OVITO_VERSION.tar.xz"
-)&> "$execution_dir/ovito_untar.log" # write execution log
+)&> "$execution_dir/logs/ovito_untar.log" # write execution log
 
 # set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
 echo "Setting 'ovito' as environment variable..."
@@ -92,7 +93,9 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 
 
 ### get python3 packages for future scripts
-(set -x; python3 -m pip install engineering_notation joby_m_anthony_iii pandas sympy)
+(set -x;
+    python3 -m pip install engineering_notation joby_m_anthony_iii pandas sympy
+)
 
 
 

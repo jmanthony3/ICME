@@ -15,17 +15,36 @@
 set +x
 execution_dir=$(pwd)
 who=$(whoami)
+mkdir "$execution_dir/logs"
+mkdir "$execution_dir/logs/1-ElectronicsToAtomistics"
+mkdir "$execution_dir/logs/2-AtomisticsToDislocationMobility"
+mkdir "$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity"
 
 
 
 ########################### BRIDGES ###########################
 ### setup bridges
+# bridge: 1
 echo "Setting up '1-ElectronicsToAtomistics' bridge..."
-cd "1-ElectronicsToAtomistics"; ./setup.sh # 1
+cd "1-ElectronicsToAtomistics"
+(set -x; ./setup.sh) \
+>"$execution_dir/logs/1-ElectronicsToAtomistics/setup.log" \
+2>&"$execution_dir/logs/1-ElectronicsToAtomistics/errors.log"
+
+# bridge: 2
 clear; echo "Setting up '2-AtomisticsToDislocationMobility' bridge..."
-cd "../2-AtomisticsToDislocationMobility"; ./setup.sh # 2
+cd "../2-AtomisticsToDislocationMobility"
+(set -x; ./setup.sh) \
+>"$execution_dir/logs/2-AtomisticsToDislocationMobility/setup.log" \
+2>&"$execution_dir/logs/1-AtomisticsToDislocationMobility/errors.log"
+
+# bridge: 3
 clear; echo "Setting up '3-DislocationMobilityToCrystalPlasticity' bridge..."
-cd "../3-DislocationMobilityToCrystalPlasticity"; ./setup.sh # 3
+cd "../3-DislocationMobilityToCrystalPlasticity"
+(set -x; ./setup.sh) \
+>"$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity/setup.log" \
+2>&"$execution_dir/logs/1-DislocationMobilityToCrystalPlasticity/errors.log"
+
 echo "Done."
 
 

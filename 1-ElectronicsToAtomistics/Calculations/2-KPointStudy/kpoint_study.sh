@@ -59,7 +59,8 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     ibrav=3
 else
-    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
+    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
+        not understood. Must be either 'fcc' or 'bcc'."
     exit
 fi
 echo "Based on $reference_structure, ibrav=$ibrav"
@@ -72,7 +73,8 @@ sed -i "64s%^[[:digit:]]*[^ #]*%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
 ### automatically define other `EvA_EvV_plot.py` file variables from inputs
-sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" "../0-Scripts/EvA_EvV_plot.py"
+sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" \
+    "../0-Scripts/EvA_EvV_plot.py"
 
 
 
@@ -120,19 +122,22 @@ ATOMIC_SPECIES
 ATOMIC_POSITIONS (alat)
  $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
 K_POINTS (automatic)
- ${kpoints[0]} ${kpoints[1]} ${kpoints[2]} ${kpoints_shift[0]} ${kpoints_shift[1]} ${kpoints_shift[2]}""" > "$input_filename.in"
+ ${kpoints[0]} ${kpoints[1]} ${kpoints[2]} ${kpoints_shift[0]} ${kpoints_shift[1]} ${kpoints_shift[2]}\
+        """ > "$input_filename.in"
 
         ### execute QE with input parameters
         echo "Executing QE according to $input_filename.in..."
-        (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out")
+        (set -x;
+            mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > 
+            "$input_filename.out"
+        )
 
         ### run Fortran codes on input files
         # create appropriate input file to `ev_curve`
-        cp "$input_filename.in" "../../0-Scripts/$REFERENCE_STRUCTURE.ev.in" # create appropriate input file to `ev_curve`
+        cp "$input_filename.in" "../../0-Scripts/$REFERENCE_STRUCTURE.ev.in"
         rm -r "temp/" # remove calculations temporary folder
         cd "../../0-Scripts" # move into Scripts folder
         gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
-        # chmod +x "ev_curve" # makes file executable
         sed -i "s%pseudo_dir = '\.\./\.\./',%pseudo_dir = '\.\./'%" "$REFERENCE_STRUCTURE.ev.in"
         # this outputs `evfit.4`: reference structure, lattice parameter
         ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER
@@ -178,7 +183,8 @@ K_POINTS (automatic)
         # offset energy value
         offset_energy=$(echo "$energy+$ENERGY_OFFSET" | bc)
         # replace energy value
-        sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY.$cutoff_energy.$K"
+        sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" \
+            "SUMMARY.$cutoff_energy.$K"
         # get lattice parameter [angstrom]
         lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY.$cutoff_energy.$K")
         # previous bulk modulus [kbar]
@@ -186,13 +192,15 @@ K_POINTS (automatic)
         # convert to [GPa]
         bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
         # replace bulk modulus
-        sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY.$cutoff_energy.$K"
+        sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" \
+            "SUMMARY.$cutoff_energy.$K"
         ## append data files
         echo "$K $offset_energy" >> "./EvsK.dat"
         echo "$K $lattice_parameter" >> "./AvsK.dat"
         echo "$K $bulk_gpa" >> "./GvsK.dat"
         conv_time=$(sed -n "s%^Total RUN time (sec)           = %%p" "SUMMARY.$cutoff_energy.$K")
-        conv_iter=$(sed -n "s%^[[:blank:]]*convergence has been achieved in[[:blank:]]*%%p" "$input_filename.out" | sed "s% iterations$%%")
+        conv_iter=$(sed -n "s%^[[:blank:]]*convergence has been achieved in[[:blank:]]*%%p" \
+            "$input_filename.out" | sed "s% iterations$%%")
         echo "$K $conv_time $conv_iter" >> "./TvsK.dat"
         # end of `K`-point
     done # end of `cutoff_energy`

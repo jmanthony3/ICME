@@ -88,7 +88,8 @@ for temp in "${TEMP[@]}"; do
         elif [[ "$reference_structure" == "hcp" ]]; then
             ATOM_DISLOCATION_ARGUMENTS[0]="3"
         else
-            echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc', 'bcc', or 'hcp'."
+            echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
+                not understood. Must be either 'fcc', 'bcc', or 'hcp'."
             exit
         fi
         # element name selection
@@ -115,7 +116,8 @@ for temp in "${TEMP[@]}"; do
         elif [[ $dislocation_type == "screw" ]]; then
             ATOM_DISLOCATION_ARGUMENTS[3]="2"
         else
-            echo "Variable DISLOCATION_TYPE=$DISLOCATION_TYPE not understood. Must be either 'edge' or 'screw'."
+            echo "Variable DISLOCATION_TYPE=$DISLOCATION_TYPE \
+                not understood. Must be either 'edge' or 'screw'."
             exit
         fi
         # structure type selection
@@ -127,35 +129,46 @@ for temp in "${TEMP[@]}"; do
         elif [[ $structure_type == "perfect fcc crystal" ]]; then
             ATOM_DISLOCATION_ARGUMENTS[4]="3"
         else
-            echo "Variable STRUCTURE_TYPE=$STRUCTURE_TYPE not understood. Must be either 'cylinder', 'PAD' or 'Perfect FCC crystal'."
+            echo "Variable STRUCTURE_TYPE=$STRUCTURE_TYPE \
+                not understood. Must be either 'cylinder', 'PAD' or 'Perfect FCC crystal'."
             exit
         fi
         # compile `atom-dislocation` script
         (set -x; gfortran -O3 "Dislocation.f90" -o "atom-dislocation")
         # generates atoms.`REFERENCE_STRUCTURE`.`DISLOCATION_TYPE`.`STRUCTURE_TYPE` file
         echo "Ignore consequent errors..."
-        (set -x; ./atoms.sh ${ATOM_DISLOCATION_ARGUMENTS[0]} ${ATOM_DISLOCATION_ARGUMENTS[1]} $ELEMENT_NUM ${ATOM_DISLOCATION_ARGUMENTS[3]} ${ATOM_DISLOCATION_ARGUMENTS[4]})
+        (set -x;
+            ./atoms.sh ${ATOM_DISLOCATION_ARGUMENTS[0]} ${ATOM_DISLOCATION_ARGUMENTS[1]} $ELEMENT_NUM ${ATOM_DISLOCATION_ARGUMENTS[3]} ${ATOM_DISLOCATION_ARGUMENTS[4]}
+        )
 
         ### modify `atom-dislocation` script
         # determine if encoded temperature is of type float or int
         if [[ $temp =~ ^[+-]?[0-9]*\.[0-9]+$ ]]
         then
-            sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp%" "./DisVelocity.in"
+            sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp%" \
+                "./DisVelocity.in"
         else
-            sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp.%" "./DisVelocity.in"
+            sed -i "s%^variable temp equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable temp equal $temp.%" \
+                "./DisVelocity.in"
         fi # should be float
         # determine if encoded stress is of type float or int
         if [[ $sigma_bar =~ ^[+-]?[0-9]*\.[0-9]+$ ]]
         then
-            sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar%" "./DisVelocity.in"
+            sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar%" \
+                "./DisVelocity.in"
         else
-            sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar.%" "./DisVelocity.in"
+            sed -i "s%^variable sigma equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable sigma equal $sigma_bar.%" \
+                "./DisVelocity.in"
         fi # should be float
         # update other variables
-        sed -i "s%^variable material string [[:alpha:]]*[^[:blank:]#]*%variable material string $ELEMENT_NAME%" "./DisVelocity.in"
-        sed -i "s%^variable atom_file string atoms[\.[[:alpha:]]]*[^[:blank:]#]*%variable atom_file string atoms.$reference_structure.$dislocation_type.$structure_type%" "./DisVelocity.in"
-        sed -i "s%^variable equilTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable equilTime equal $equilTime%" "./DisVelocity.in"
-        sed -i "s%^variable runTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable runTime equal $runTime%" "./DisVelocity.in"
+        sed -i "s%^variable material string [[:alpha:]]*[^[:blank:]#]*%variable material string $ELEMENT_NAME%" \
+            "./DisVelocity.in"
+        sed -i "s%^variable atom_file string atoms[\.[[:alpha:]]]*[^[:blank:]#]*%variable atom_file string atoms.$reference_structure.$dislocation_type.$structure_type%" \
+            "./DisVelocity.in"
+        sed -i "s%^variable equilTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable equilTime equal $equilTime%" \
+            "./DisVelocity.in"
+        sed -i "s%^variable runTime equal [[:digit:]]*\.*[[:digit:]]*[^[:blank:]#]*%variable runTime equal $runTime%" \
+            "./DisVelocity.in"
 
         ### execute LAMMPS with input parameters
         nohup mpirun -np 50 lmp_rescale-amd-userlib -in "./DisVelocity.in"

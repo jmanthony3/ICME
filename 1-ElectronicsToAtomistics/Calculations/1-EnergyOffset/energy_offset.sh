@@ -54,12 +54,14 @@ if [[ "$reference_structure" == "fcc" ]]; then
 elif [[ "$reference_structure" == "bcc" ]]; then
     ibrav=3
 else
-    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE not understood. Must be either 'fcc' or 'bcc'."
+    echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
+        not understood. Must be either 'fcc' or 'bcc'."
     exit
 fi
 echo "Based on $reference_structure, ibrav=$ibrav"
-# converts to bohr and sets to large value for offset
-lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973*4" | bc -l) # bohr
+# '*1.88973' converts [angstrom] to [bohr]
+# '*4' sets large value for offset
+lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973*4" | bc -l)
 input_filename="${ELEMENT_NAME}_offset" # name input file
 
 
@@ -84,7 +86,8 @@ ATOMIC_SPECIES
 ATOMIC_POSITIONS (alat)
  $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
 K_POINTS (automatic)
- ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}""" > "$input_filename.in"
+ ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}\
+""" > "$input_filename.in"
 # print input file to terminal
 echo "========== Contents of $input_filename.in =========="
 cat "$input_filename.in"
@@ -95,12 +98,16 @@ echo "===================================================="
 ################### CALCULATE OFFSET ENERGY ###################
 ### execute QE with input parameters
 echo "Executing QE according to $input_filename.in..."
-(set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$input_filename.out")
+(set -x;
+    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > 
+    "$input_filename.out"
+)
 
 
 ### grab `total energy`, which is in [Ry], from `.out` file
 energy_offset=$( # grabs only the [Ry] value
-    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | sed "s% Ry$%%"
+    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | 
+    sed "s% Ry$%%"
 )
 # '*-13.6057' converts [Ry] to [eV]
 energy_offset=$(echo "$energy_offset*-13.6057" | bc)
@@ -108,10 +115,14 @@ echo "Energy offset found to be $energy_offset eV"
 
 
 ### replace offset energies in companion scripts
-sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $energy_offset%" "../0-Scripts/EvA_EvV_plot.py"
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../2-KPointStudy/kpoint_study.sh"
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../3-GSFE/gsfe_create.sh"
-sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" "../3-GSFE/gsfe_process.sh"
+sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $energy_offset%" \
+    "../0-Scripts/EvA_EvV_plot.py"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" \
+    "../2-KPointStudy/kpoint_study.sh"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" \
+    "../3-GSFE/gsfe_create.sh"
+sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" \
+    "../3-GSFE/gsfe_process.sh"
 
 
 ### run Fortran codes on input files
@@ -168,7 +179,8 @@ energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY_offset")
 # offset energy value
 offset_energy=$(echo "$energy+$energy_offset" | bc)
 # replace energy value
-sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY_offset"
+sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" \
+    "SUMMARY_offset"
 # get lattice parameter [angstrom]
 lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY_offset")
 # previous bulk modulus [kbar]
@@ -176,7 +188,8 @@ bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY_offset")
 # convert to [GPa]
 bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
 # replace bulk modulus
-sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY_offset"
+sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" \
+    "SUMMARY_offset"
 
 # print summary file to terminal
 cat "SUMMARY_offset"

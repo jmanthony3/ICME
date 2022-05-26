@@ -25,6 +25,7 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
 who=$(whoami) # current user
+mkdir "$execution_dir/logs"
 
 
 
@@ -39,24 +40,32 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
 
 # copy tarball into installation directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
-cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" "$QUANTUM_ESPRESSO_INSTALL_LOC/"
+cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
+"$QUANTUM_ESPRESSO_INSTALL_LOC/"
 
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 echo "+ cd $QUANTUM_ESPRESSO_INSTALL_LOC"
 echo "+ tar -xzvf $QUANTUM_ESPRESSO_VERSION.tar.gz"
+# write execution log
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
-)&> "$execution_dir/quantum_espresso_untar.log" # write execution log
+)&> "$execution_dir/logs/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure && make all`
 (set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION")
 echo "+ ./configure"
 # write execution log
-(set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && ./configure)&> "$execution_dir/quantum_espresso_configure.log"
+(set -x;
+    cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
+    ./configure
+)&> "$execution_dir/logs/quantum_espresso_configure.log"
 echo "+ make all"
 # write execution log
-(set -x; cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION" && make all)&> "$execution_dir/quantum_espresso_make.log"
+(set -x;
+    cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
+    make all
+)&> "$execution_dir/logs/quantum_espresso_make.log"
 
 # set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
 echo "Setting 'pw.x' as environment variable..."
@@ -85,7 +94,6 @@ echo "Executing QE according to Cu.in..."
 
 # create EvsA and EvsV curves
 cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
-# chmod +x ./ev_curve # makes file executable
 (set -x; ./ev_curve fcc 3.628) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
@@ -125,7 +133,8 @@ echo "Installing Python 2..."
 (set -x; python2 "gsfe_curve.py" fcc 3.615 partial &)
 sleep 10s # let previous process spin up
 pid=$(pgrep pw.x) # get pid of `pw.x` process
-echo "Killing the 'gsfe_curve.py' process ('PID=$pid') because this will take too long..."
+echo "Killing the 'gsfe_curve.py' process ('PID=$pid') \
+    because this will take too long..."
 kill $pid
 # move (in/out)put files to `./test/`
 mv "gsfe.in" "./test/"
