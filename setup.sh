@@ -25,21 +25,24 @@ mkdir "$execution_dir/logs"
 echo "Setting up '1-ElectronicsToAtomistics' bridge..."
 echo "+ $execution_dir/1-ElectronicsToAtomistics/setup.sh"
 cd "$execution_dir/1-ElectronicsToAtomistics"
-(set -x; ./setup.sh) &>"$execution_dir/logs/1-ElectronicsToAtomistics.log"
+pv -p --timer --rate --bytes | # show progress of bridge setup
+    (set -x; ./setup.sh) &>"$execution_dir/logs/1-ElectronicsToAtomistics.log"
 
 # bridge: 2
 clear; echo "Setting up '2-AtomisticsToDislocationMobility' bridge..."
 echo "+ $execution_dir/2-AtomisticsToDislocationMobility/setup.sh"
 cd "$execution_dir/2-AtomisticsToDislocationMobility"
-(set -x; ./setup.sh) &>"$execution_dir/logs/2-AtomisticsToDislocationMobility.log"
+pv -p --timer --rate --bytes | # show progress of bridge setup
+    (set -x; ./setup.sh) &>"$execution_dir/logs/2-AtomisticsToDislocationMobility.log"
 
 # bridge: 3
 clear; echo "Setting up '3-DislocationMobilityToCrystalPlasticity' bridge..."
 echo "+ $execution_dir/3-DislocationMobilityToCrystalPlasticity"
 cd "$execution_dir/3-DislocationMobilityToCrystalPlasticity"
-(set -x; ./setup.sh) &>"$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity.log"
+pv -p --timer --rate --bytes | # show progress of bridge setup
+    (set -x; ./setup.sh) &>"$execution_dir/logs/3-DislocationMobilityToCrystalPlasticity.log"
 
-echo "Done."
+clear; echo "Done."
 
 
 
