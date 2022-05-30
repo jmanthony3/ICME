@@ -38,6 +38,8 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
     sudo apt-get install build-essential
 )
 sudo apt-get install pv
+sudo apt-get update
+sleep 5s
 
 # copy tarball into installation directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
