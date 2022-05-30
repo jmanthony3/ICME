@@ -7,7 +7,7 @@ Joby M. Anthony III <jmanthony1@liberty.edu>
 :description: Scripts necessary to bridge certain length scales of Integrated Computational Materials Engineering design process.
 // :keywords: 
 :imagesdir: {docdir}/README
-// :bibtex-file: README.bib
+:bibtex-file: README.bib
 :toc: auto
 :xrefstyle: short
 :sectnums: |,all|
