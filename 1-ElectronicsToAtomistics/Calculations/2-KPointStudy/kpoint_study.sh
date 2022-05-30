@@ -69,7 +69,7 @@ lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l)
 
 
 ### automatically define other `ev_curve` file variables from inputs
-sed -i "64s%^[[:digit:]]*[^ #]*%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
+sed -i "64s%^[[:digit:]]*[^ #]%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
 ### automatically define other `EvA_EvV_plot.py` file variables from inputs
@@ -128,8 +128,8 @@ K_POINTS (automatic)
         ### execute QE with input parameters
         echo "Executing QE according to $input_filename.in..."
         (set -x;
-            mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > 
-            "$input_filename.out"
+            mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
+                > "$input_filename.out" 2> /dev/null
         )
 
         ### run Fortran codes on input files
@@ -137,10 +137,11 @@ K_POINTS (automatic)
         cp "$input_filename.in" "../../0-Scripts/$REFERENCE_STRUCTURE.ev.in"
         rm -r "temp/" # remove calculations temporary folder
         cd "../../0-Scripts" # move into Scripts folder
-        gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
-        sed -i "s%pseudo_dir = '\.\./\.\./',%pseudo_dir = '\.\./'%" "$REFERENCE_STRUCTURE.ev.in"
+        gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
+        sed -i "s%pseudo_dir = '\.\./\.\./',%pseudo_dir = '\.\./'%" \
+            "$REFERENCE_STRUCTURE.ev.in"
         # this outputs `evfit.4`: reference structure, lattice parameter
-        ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER
+        ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER 2>/dev/null
         python3 "EvA_EvV_plot.py" # generate plots
         # move all output files back to `cutoff_energy` directory
         # create appropriate input file to `ev_curve`
@@ -164,20 +165,21 @@ K_POINTS (automatic)
             "EvsV.$cutoff_energy.$K"
         )
         for input in "${inputs[@]}"; do
-            echo "Opening $input to offset by $ENERGY_OFFSET eV..."
+            echo -e -n "Opening $input to offset by $ENERGY_OFFSET eV...\r"
             i=1
             readarray file < $input
             for line in "${file[@]}"; do
                 IFS=" " read -a elem <<< "$line"
                 energy=${elem[1]}
                 offset_energy=$(echo "$energy+$ENERGY_OFFSET" | bc)
-                sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
+                sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" \
+                    "$input"
                 i=$(echo "$i+1" | bc) # end line `i`
             done # end of `input` file
-            echo "Closing $input..."
+            echo -e -n "Closing $input...\r"
         done # end of processing
         ## adjust summary file
-        echo "Adjusting summary files by $ENERGY_OFFSET eV..."
+        echo -e -n "Adjusting summary files by $ENERGY_OFFSET eV...\r"
         # previous energy value
         energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY.$cutoff_energy.$K")
         # offset energy value
@@ -202,6 +204,7 @@ K_POINTS (automatic)
         conv_iter=$(sed -n "s%^[[:blank:]]*convergence has been achieved in[[:blank:]]*%%p" \
             "$input_filename.out" | sed "s% iterations$%%")
         echo "$K $conv_time $conv_iter" >> "./TvsK.dat"
+        echo -e -n "                                                        \r"
         # end of `K`-point
     done # end of `cutoff_energy`
     cd "../"

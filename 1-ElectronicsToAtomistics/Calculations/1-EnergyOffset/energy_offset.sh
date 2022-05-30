@@ -91,7 +91,7 @@ K_POINTS (automatic)
 # print input file to terminal
 echo "========== Contents of $input_filename.in =========="
 cat "$input_filename.in"
-echo "===================================================="
+echo "========================================"
 
 
 
@@ -99,15 +99,16 @@ echo "===================================================="
 ### execute QE with input parameters
 echo "Executing QE according to $input_filename.in..."
 (set -x;
-    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > 
-    "$input_filename.out"
+    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
+        > "$input_filename.out" 2> /dev/null
 )
+rm -r "temp/" # remove calculations temporary folder
 
 
 ### grab `total energy`, which is in [Ry], from `.out` file
 energy_offset=$( # grabs only the [Ry] value
-    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" "$input_filename.out" | 
-    sed "s% Ry$%%"
+    sed -n "s%\![[:space:]]*total energy[[:space:]]* = [[:space:]]*%%p" \
+        "$input_filename.out" | sed "s% Ry$%%"
 )
 # '*-13.6057' converts [Ry] to [eV]
 energy_offset=$(echo "$energy_offset*-13.6057" | bc)
@@ -131,10 +132,9 @@ cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in"
 
 # move to Scripts folder
 cd "../0-Scripts"
-gfortran -O2 "evfit.f" -o "evfit" # compiles `evfit.f` outputs `evfit`
-# chmod +x "ev_curve" # makes file executable
+gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
 # this outputs `evfit.4`: reference structure, lattice parameter
-./ev_curve $reference_structure $LATTICE_PARAMETER
+./ev_curve $reference_structure $LATTICE_PARAMETER 2> /dev/null
 python3 "EvA_EvV_plot.py" # generate plots
 
 # move all output files back to working directory
@@ -159,7 +159,7 @@ declare -a inputs=(
     "EvsV_offset"
 )
 for input in "${inputs[@]}"; do
-    echo "Opening $input to offset by $energy_offset eV..."
+    echo -e -n "Opening $input to offset by $energy_offset eV...\r"
     i=1
     readarray file < $input
     for line in "${file[@]}"; do
@@ -169,11 +169,11 @@ for input in "${inputs[@]}"; do
         sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
         i=$(echo "$i+1" | bc) # end line `i`
     done # end of `input` file
-    echo "Closing $input..."
+    echo -e -n "Closing $input...\r"
 done # end of processing
 
 # adjust summary file
-echo "Adjusting summary files by $energy_offset eV..."
+echo -e -n "Adjusting summary files by $energy_offset eV...\r"
 # previous energy value
 energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY_offset")
 # offset energy value
@@ -191,8 +191,10 @@ bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
 sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" \
     "SUMMARY_offset"
 
-# print summary file to terminal
+# print study summary to terminal
+echo "                                                        "
 cat "SUMMARY_offset"
+echo -e -n "\nEnergy offset found to be $energy_offset eV\n"
 
 
 

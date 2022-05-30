@@ -28,8 +28,8 @@ who=$(whoami) # current user
 ### test directory
 # copy/paste necessary files for example
 cd "$execution_dir/Files"
-rm -r "test/" || mkdir "test"
-rm -r "test/RescaleUpload" || mkdir "test/RescaleUpload"
+rm -r "test/" 2> /dev/null ; mkdir "test"
+rm -r "test/RescaleUpload" 2> /dev/null ; mkdir "test/RescaleUpload"
 # copy (in/out)put files to `./test/RescaleUpload/`
 reference_structure=$(echo $REFERENCE_STRUCTURE | tr '[:upper:]' '[:lower:]')
 if [[ "$reference_structure" == "fcc" ]]; then

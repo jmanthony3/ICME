@@ -40,18 +40,15 @@ if [[ "$reference_structure" == "fcc" ]]; then
     # $(printf '%g %g %g' 
     sed -i "2s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*%${C[0]} ${C[1]} ${C[2]}     / c11(c1), c12(c2), c44(c3) /%" \
         "./fcc.sx"
-
     # drag coefficient
     sed -i "s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ bdrag /%$DRAG_COEFFICIENT     / bdrag /%" \
         "./fcc.sx"
-
     # initial hardening rate
     # sed -i "s%[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ h0, tausi, taus0, xms, gamss0 /%$H0 3.7  30.80  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" "./fcc.sx"
     sed -i "14s%[[:print:]]*%$H0 $KAPPA_0  $KAPPA_S  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" \
         "./fcc.sx"
     sed -i "34s%[[:print:]]*%$H0 $KAPPA_0  $KAPPA_S  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" \
         "./fcc.sx"
-
     # initial strength
     sed -i "s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ initial slip system hardness (kappa0) /%$KAPPA_0     / initial slip system hardness (kappa0) /%" \
         "./fcc.sx"
@@ -60,11 +57,9 @@ elif [[ "$reference_structure" == "bcc" ]]; then
     # $(printf '%g %g %g' 
     sed -i "2s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*%${C[0]} ${C[1]} ${C[2]}     / c11(c1), c12(c2), c44(c3) /%" \
         "./bcc.sx"
-
     # drag coefficient
     sed -i "s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ bdrag /%$DRAG_COEFFICIENT     / bdrag /%" \
         "./bcc.sx"
-
     # initial hardening rate
     # sed -i "s%[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ h0, tausi, taus0, xms, gamss0 /%$H0 3.7  30.80  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" "./bcc.sx"
     sed -i "14s%[[:print:]]*%$H0 $KAPPA_0  $KAPPA_S  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" \
@@ -73,7 +68,6 @@ elif [[ "$reference_structure" == "bcc" ]]; then
         "./bcc.sx"
     sed -i "54s%[[:print:]]*%$H0 $KAPPA_0  $KAPPA_S  0.0-4  5.0e10     / h0, tausi, taus0, xms, gamss0 /%" \
         "./bcc.sx"
-
     # initial strength
     sed -i "s%^[[:alpha:]]*.*[[:alpha:]]*e*-*[[:alpha:]]*[[:blank:]]*/ initial slip system hardness (kappa0) /%$KAPPA_0     / initial slip system hardness (kappa0) /%" \
         "./bcc.sx"
@@ -183,7 +177,7 @@ PWD=$(pwd) # get pwd and store in variable
 # modify `umat_xtal.f` with `PWD` and strain rate
 sed -i "95s%^[[:print:]]*%     \&    /'$PWD'/%" "./umat_xtal.f"
 sed -i "7828s%^      RATE = 0.0001D-00%      RATE = ${STRAIN_RATE[2]}D-00%" \
-"./umat_xtal.f"
+    "./umat_xtal.f"
 
 (set -x; # execute Abaqus with input parameters for shear
     abaqus job=icme.cpfem.single.shear input=rve.single.inp user=umat_xtal.f cpus=2 double

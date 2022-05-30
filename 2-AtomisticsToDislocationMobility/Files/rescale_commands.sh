@@ -8,7 +8,7 @@
 # 1) FCC
 # 2) BCC
 # 3) HCP
-REFERENCE_STRUCTURE="fcc" # crystal structure
+REFERENCE_STRUCTURE="bcc" # crystal structure
 
 ## element name
 # 1) FCC
@@ -26,7 +26,7 @@ REFERENCE_STRUCTURE="fcc" # crystal structure
 #       1) Mg (Sun et al, 2006)
 #       1) Mg (Liu et al, 1996)
 #       1) Mg (experimental value)
-ELEMENT_NAME="Cu" # Periodic Table identifier of element
+ELEMENT_NAME="Fe" # Periodic Table identifier of element
 
 ELEMENT_NUM="40 20 2" # number of `ELEMENT_NAME` atoms in x, y, z directions
 

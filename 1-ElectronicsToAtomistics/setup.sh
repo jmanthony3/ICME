@@ -41,7 +41,7 @@ echo "Updating distro and including cmake, gcc, gfortran, and make..."
 # copy tarball into installation directory
 mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
 cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
-"$QUANTUM_ESPRESSO_INSTALL_LOC/"
+    "$QUANTUM_ESPRESSO_INSTALL_LOC/"
 
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
 (set -x;
@@ -84,14 +84,14 @@ mkdir "test" # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
-    mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out"
+    mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
     # compiles `evfit.f` outputs `ev_curve`
-    gfortran -O2 "evfit.f" -o "evfit"
+    gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null
 )
 
 # create EvsA and EvsV curves
 cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
-(set -x; ./ev_curve fcc 3.628) # reference structure, lattice parameter
+(set -x; ./ev_curve fcc 3.628 2> /dev/null) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
     sudo apt-get install python3-pip # install pip3

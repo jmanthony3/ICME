@@ -41,7 +41,7 @@ EQ_OF_STATE=4
 
 
 ####################### `EvA_EvV_plot.py` #####################
-ENERGY_OFFSET=4479.41619611 # [Ry]
+ENERGY_OFFSET=4479.47132505 # [Ry]
 
 
 
@@ -76,41 +76,43 @@ else
         not understood. Must be either 'fcc' or 'bcc'."
     exit
 fi
-# echo "Based on $reference_structure, ibrav=$ibrav"
+echo "Based on $reference_structure, ibrav=$ibrav"
 # '*1.88973' converts [angstrom] to [bohr]
-# lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l) # bohr
-# input_filename=$ELEMENT_NAME # name input file
+lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l)
+input_filename=$ELEMENT_NAME # name input file
 
 
-# ### write input file
-# # input file
-# echo """ &control
-#     prefix=''
-#     outdir='temp'
-#     pseudo_dir = '../',
-#  /
-#  &system
-#     ibrav=  $IBRAV, celldm(1) =$lattice_parameter_bohr, nat=  1, ntyp=  1,
-#     ecutwfc =$CUTOFF_ENERGY,
-#     occupations='smearing', smearing='mp', degauss=0.06
-#  /
-#  &electrons
-#     electron_maxstep =$MAX_ITER,
-#     mixing_beta =$MIXING_BETA,
-#  /
-# ATOMIC_SPECIES
-#  $ELEMENT_NAME  $ELEMENT_AMU $PSEUDOPOTENTIAL_FILENAME
-# ATOMIC_POSITIONS (alat)
-#  $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
-# K_POINTS (automatic)
-#  ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}""" > "$input_filename.in"
-# echo "========== Contents of $input_filename.in =========="
-# cat "$input_filename.in"
-# echo "===================================================="
+### write input file
+# input file
+echo """ &control
+    prefix=''
+    outdir='temp'
+    pseudo_dir = '../',
+ /
+ &system
+    ibrav=  $ibrav, celldm(1) =$lattice_parameter_bohr, nat=  1, ntyp=  1,
+    ecutwfc =$CUTOFF_ENERGY,
+    occupations='smearing', smearing='mp', degauss=0.06
+ /
+ &electrons
+    electron_maxstep =$MAX_ITER,
+    mixing_beta =$MIXING_BETA,
+ /
+ATOMIC_SPECIES
+ $ELEMENT_NAME  $ELEMENT_AMU $PSEUDOPOTENTIAL_FILENAME
+ATOMIC_POSITIONS (alat)
+ $ELEMENT_NAME ${ELEMENT_POS[0]} ${ELEMENT_POS[1]} ${ELEMENT_POS[2]}
+K_POINTS (automatic)
+ ${KPOINTS[0]} ${KPOINTS[1]} ${KPOINTS[2]} ${KPOINTS_SHIFT[0]} ${KPOINTS_SHIFT[1]} ${KPOINTS_SHIFT[2]}\
+""" > "$input_filename.in"
+# print input file to terminal
+echo "========== Contents of $input_filename.in =========="
+cat "$input_filename.in"
+echo "========================================"
 
 
 ### automatically define other `ev_curve` file variables from inputs
-sed -i "64s%^[[:digit:]]*[^ #]*%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
+sed -i "64s%^[[:digit:]]*[^ #]%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
 ### automatically define other `EvA_EvV_plot.py` file variables from inputs
@@ -133,17 +135,17 @@ else
 fi
 
 # modify `OutputFileCreator.py` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" \
+sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
     "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" \
+sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
     "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
+sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
     "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" \
+sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]%el_weight = $ELEMENT_AMU%" \
     "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
+sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
     "../0-Scripts/OutputFileCreator.py"
-sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" \
+sed -i "s%^kpoints = [[:digit:]]*[^ #]%kpoints = $KPOINT%" \
     "../0-Scripts/OutputFileCreator.py"
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
     "../0-Scripts/OutputFileCreator.py"
@@ -151,17 +153,17 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
     "../0-Scripts/OutputFileCreator.py"
 
 # modify `OutputSummarizer.py` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]*%num_proc = 16%" \
+sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
     "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^el = '[[:print:]]*'[^ #]*%el = '$ELEMENT_NAME'%" \
+sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
     "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^potential = '[[:print:]]*'[^ #]*%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
+sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
     "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]*%el_weight = $ELEMENT_AMU%" \
+sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]%el_weight = $ELEMENT_AMU%" \
     "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]*%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
+sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
     "../0-Scripts/OutputSummarizer.py"
-sed -i "s%^kpoints = [[:digit:]]*[^ #]*%kpoints = $KPOINT%" \
+sed -i "s%^kpoints = [[:digit:]]*[^ #]%kpoints = $KPOINT%" \
     "../0-Scripts/OutputSummarizer.py"
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
     "../0-Scripts/OutputSummarizer.py"
@@ -171,68 +173,103 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 
 
 ###################### GENERATE GSFE DATA #####################
-# ### execute QE with input parameters
-# echo "Executing QE according to $input_filename.in..."
-# (set -x; mpirun -np $NUM_PROC pw.x -in "$input_filename.in" > "$ELEMENT_NAME.out")
+### execute QE with input parameters
+echo "Executing QE according to $input_filename.in..."
+(set -x;
+    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
+        > "$input_filename.out" 2> /dev/null
+)
+rm -r "temp/" # remove calculations temporary folder
 
 
-# ### run Fortran codes on input files
-# gfortran -O2 "../0-Scripts/evfit.f" -o "../0-Scripts/evfit" # compiles `evfit.f` outputs `evfit`
-# chmod +x "../0-Scripts/ev_curve" # makes file executable
-# cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in" # create appropriate input file to `ev_curve`
-# cd "../0-Scripts"
-# # this outputs `evfit.4`: reference structure, lattice parameter
-# ./ev_curve $reference_structure $LATTICE_PARAMETER
-# python3 "EvA_EvV_plot.py" # generate plots
-# mv "$reference_structure.ev.in" "../3-GSFE/$reference_structure.ev.in"
-# mv "evfit" "../3-GSFE/evfit"
-# mv "EvsA" "../3-GSFE/EvsA"
-# mv "EvsV" "../3-GSFE/EvsV"
-# mv "SUMMARY" "../3-GSFE/SUMMARY"
-# mv "evfit.4" "../3-GSFE/evfit.4"
-# mv "pw_ev.out" "../3-GSFE/pw_ev.out"
-# mv "Name_of_EvA.pdf" "../3-GSFE/Name_of_EvA.pdf"
-# mv "Name_of_EvV.pdf" "../3-GSFE/Name_of_EvV.pdf"
-# mv "Name_of_Combined.pdf" "../3-GSFE/Name_of_Combined.pdf"
-# rm -r "temp/"
-# cd "../3-GSFE"
-# declare -a inputs=(
-#     "EvsA"
-#     "EvsV"
-# )
-# for input in "${inputs[@]}"; do
-#     echo "Opening $input to offset by $ENERGY_OFFSET eV..."
-#     i=1
-#     init_energy=$(sed -n "${i}s%^[[:digit:]]\.[[:digit:]]* %%p" "$input")
-#     init_energy=$(echo "$init_energy+$ENERGY_OFFSET" | bc)
-#     init_energy=$(sed -n "s%-*%%p" <<< $init_energy)
-#     readarray file < $input
-#     for line in "${file[@]}"; do
-#         IFS=" " read -a elem <<< "$line"
-#         energy=${elem[1]}
-#         offset_energy=$(echo "$energy+$init_energy+$ENERGY_OFFSET" | bc)
-#         sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
-#         i=$(echo "$i+1" | bc)
-#     done # end line `i`
-#     echo "Closing $input..."
-# done # end of `input` file
-# echo "Adjusting summary files by $ENERGY_OFFSET eV..."
-# energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY")
-# offset_energy=$(echo "$energy+$init_energy+$ENERGY_OFFSET" | bc)
-# sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" "SUMMARY"
-# lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY")
-# bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY")
-# bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
-# sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" "SUMMARY"
+### run Fortran codes on input files
+# create appropriate input file to `ev_curve`
+cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in"
 
-# cat "SUMMARY"
+# move to Scripts folder
+cd "../0-Scripts"
+gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
+# this outputs `evfit.4`: reference structure, lattice parameter
+./ev_curve $reference_structure $LATTICE_PARAMETER 2> /dev/null
+python3 "EvA_EvV_plot.py" # generate plots
+
+# move all output files back to working directory
+mv "$reference_structure.ev.in" "../3-GSFE/"
+mv "evfit" "../3-GSFE/"
+mv "EvsA" "../3-GSFE/"
+mv "EvsV" "../3-GSFE/"
+mv "SUMMARY" "../3-GSFE/"
+mv "evfit.4" "../3-GSFE/"
+mv "pw_ev.out" "../3-GSFE/"
+mv "Name_of_EvA.pdf" "../3-GSFE/"
+mv "Name_of_EvV.pdf" "../3-GSFE/"
+mv "Name_of_Combined.pdf" "../3-GSFE/"
+rm -r "temp/" # remove calculations temporary folder
+
+
+### post-process output files
+# move back to working directory
+cd "../3-GSFE"
+declare -a inputs=(
+    "EvsA"
+    "EvsV"
+)
+for input in "${inputs[@]}"; do
+    echo -e -n "Opening $input to offset by $ENERGY_OFFSET eV...\r"
+    i=1
+    # init_energy=$(sed -n "${i}s%^[[:digit:]]\.[[:digit:]]* %%p" "$input")
+    # init_energy=$(echo "$init_energy+$ENERGY_OFFSET" | bc)
+    # init_energy=$(sed -n "s%-*%%p" <<< $init_energy)
+    init_energy=0
+    readarray file < $input
+    for line in "${file[@]}"; do
+        IFS=" " read -a elem <<< "$line"
+        energy=${elem[1]}
+        offset_energy=$(echo "$energy+$init_energy+$ENERGY_OFFSET" | bc)
+        sed -i "${i}s% \-[[:digit:]]*\.[[:digit:]]*% $offset_energy%" "$input"
+        i=$(echo "$i+1" | bc) # end of line `i`
+    done # end line of `input` file
+    echo -e -n "Closing $input...\r"
+done # end of processing
+
+# adjust summary file
+echo -e -n "Adjusting summary files by $ENERGY_OFFSET eV...\r"
+# previous energy value
+energy=$(sed -n "s%^Equilibrium Energy per Atom    = %%p" "SUMMARY")
+# offset energy value
+offset_energy=$(echo "$energy+$init_energy+$ENERGY_OFFSET" | bc)
+# replace energy value
+sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilibrium Energy per Atom    = $offset_energy%" \
+    "SUMMARY"
+# get lattice parameter [angstrom]
+lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY")
+# replace in `2-AtomisticsToDislocationMobility/1-DislocationVelocity/dislocation_velocity.py`
+# 1 [angstrom] = 1e-10 [m]
+sed -i "s%^lattice_parameter = [[:digit:]\.e\-]*[^ #]%lattice_parameter = ${lattice_parameter}e\-10%" \
+    "../../../2-AtomisticsToDislocationMobility/Calculations/1-DislocationVelocity/dislocation_velocity.py"
+# replace in `2-AtomisticsToDislocationMobility/2-MDDP/stress_strain.py`
+# 1 [angstrom] = 1e-10 [m]
+sed -i "s%^lattice_parameter = [[:digit:]\.e\-]*[^ #]%lattice_parameter = ${lattice_parameter}e\-10%" \
+    "../../../2-AtomisticsToDislocationMobility/Calculations/1-MDDP/stress_strain.py"
+# previous bulk modulus [kbar]
+bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY")
+# convert to [GPa]
+bulk_gpa=$(echo "scale=9;$bulk/10" | bc)
+# replace bulk modulus value
+sed -i "s%^Bulk Modulus (kbar)            = [[:digit:]]*\.[[:digit:]]*%Bulk Modulus (GPa)             = $bulk_gpa%" \
+    "SUMMARY"
+
+# print study summary to terminal
+echo "                                                        "
+cat "SUMMARY"
+echo -e -n "\nEnergy offset found to be $ENERGY_OFFSET eV\n"
 
 
 ### create Rescale(Up/Down)load structure
 # make `RescaleUpload/` folder from inputs
-rm -r "RescaleUpload/" || mkdir "RescaleUpload"
+rm -r "RescaleUpload/" 2> /dev/null ; mkdir "RescaleUpload"
 # make `RescaleDownload/` folder for outputs
-mkdir "RescaleDownload"
+mkdir "RescaleDownload" 2> /dev/null
 # move into Scripts directory
 cd "../0-Scripts/"
 mkdir "input_gens" # subsequent script places inputs here

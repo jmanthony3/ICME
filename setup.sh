@@ -12,9 +12,9 @@
 
 
 
-set +x
-execution_dir=$(pwd)
-who=$(whoami)
+set +x # turn script tracing off
+execution_dir=$(pwd)  # where script executes from
+who=$(whoami) # current user
 mkdir "$execution_dir/logs"
 
 

@@ -61,13 +61,13 @@ cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
     tar xJfv "$OVITO_VERSION.tar.xz"
 ) 2> "$execution_dir/logs/ovito_untar.log" | pv -pterb --size 82293 >"$execution_dir/logs/ovito_untar.log"
 
-# set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
-echo "Setting 'ovito' as environment variable..."
-echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:\$PATH\"" >> ~/.bashrc
+# # set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
+# echo "Setting 'ovito' as environment variable..."
+# echo "export PATH=\"$OVITO_INSTALL_LOC/$OVITO_VERSION/bin:\$PATH\"" >> ~/.bashrc
 
-# update environment variables for user
-echo "Updating environment variables for $who..."
-(set -x; source ~/.bashrc)
+# # update environment variables for user
+# echo "Updating environment variables for $who..."
+# (set -x; source ~/.bashrc)
 
 
 
@@ -103,9 +103,7 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 # copy input data files to `../Calculations/2-MDDP/`
 cp "datain" "../Calculations/2-MDDP/"
 cp "data" "../Calculations/2-MDDP/"
-# get missing library to execute `./BCCdata` binary
-wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-6/libgfortran3_6.4.0-17ubuntu1_amd64.deb
-sudo dpkg -i libgfortran3_6.4.0-17ubuntu1_amd64.deb # install library
+sudo apt-get install expect # allow execution of expect scripts
 
 (set -x;
     sudo apt-get install p7zip-full # get `7z` package

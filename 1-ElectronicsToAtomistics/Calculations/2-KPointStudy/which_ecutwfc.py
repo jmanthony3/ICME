@@ -21,9 +21,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-esub_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/EvsK").readlines()[-1].split(" ")[-1])
+esub_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/EvsK.dat").readlines()[-1].split(" ")[-1])
 for ecutwfc in cutoff_energies:
-    with open(f"{filepath}/{ecutwfc}/EvsK", "r") as f:
+    with open(f"{filepath}/{ecutwfc}/EvsK.dat", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         E = np.zeros((len(lines), 1))
@@ -71,9 +71,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-alat_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/AvsK").readlines()[-1].split(" ")[-1])
+alat_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/AvsK.dat").readlines()[-1].split(" ")[-1])
 for ecutwfc in cutoff_energies:
-    with open(f"{filepath}/{ecutwfc}/AvsK", "r") as f:
+    with open(f"{filepath}/{ecutwfc}/AvsK.dat", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         A = np.zeros((len(lines), 1))
@@ -121,9 +121,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Percent Error [%]")
 )
-bulk_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/GvsK").readlines()[-1].split(" ")[-1])/10
+bulk_normal = float(open(f"{filepath}/{cutoff_energies[-1]}/GvsK.dat").readlines()[-1].split(" ")[-1])/10
 for ecutwfc in cutoff_energies:
-    with open(f"{filepath}/{ecutwfc}/GvsK", "r") as f:
+    with open(f"{filepath}/{ecutwfc}/GvsK.dat", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         G = np.zeros((len(lines), 1))
@@ -169,9 +169,9 @@ ax2.set(
     xlabel=("K-Points"),
     ylabel=("Iterations")
 )
-time_normal = int(open(f"{filepath}/{cutoff_energies[-1]}/TvsK").readlines()[-1].split(" ")[1])
+time_normal = int(open(f"{filepath}/{cutoff_energies[-1]}/TvsK.dat").readlines()[-1].split(" ")[1])
 for ecutwfc in cutoff_energies:
-    with open(f"{filepath}/{ecutwfc}/TvsK", "r") as f:
+    with open(f"{filepath}/{ecutwfc}/TvsK.dat", "r") as f:
         lines = f.readlines()
         K = np.zeros((len(lines), 1))
         T = np.zeros((len(lines), 1))
