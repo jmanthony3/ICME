@@ -94,7 +94,7 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 
 ### get python3 packages for future scripts
 (set -x;
-    python3 -m pip install engineering_notation joby_m_anthony_iii pandas sympy
+    python3 -m pip install engineering_notation joby_m_anthony_iii ovito pandas sympy
 )
 
 
