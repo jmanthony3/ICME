@@ -32,11 +32,10 @@ mkdir "$execution_dir/logs"
 ####################### INSTALL SOFTWARE ######################
 ### installing quantum espresso
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
-echo "Updating distro and including cmake, gcc, gfortran, and make..."
+echo "Updating distro and including gcc, g++, gfortran, and make..."
 (set -x;
-    sudo apt-get update
-    sudo apt-get install pv
-    sudo apt-get install build-essential
+    sudo apt-get -y update
+    sudo apt-get -y install pv gfortran build-essential
 )
 
 # copy tarball into installation directory
@@ -53,7 +52,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 
 # `cd` into that extracted folder and execute `./configure`
 (set -x;
-    cd $QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION
+    cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
 # show progress of configure and write log
 ) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5813 > "$execution_dir/logs/quantum_espresso_configure.log"
@@ -120,8 +119,7 @@ echo "Installing Python 2..."
 (set -x;
     sudo add-apt-repository universe
     sudo apt-get update
-    sudo apt-get install python2
-    sudo apt-get install curl
+    sudo apt-get install python2 curl
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
     sudo python2 get-pip.py
     pip2 --version
