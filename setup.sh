@@ -17,6 +17,7 @@ execution_dir=$(pwd)  # where script executes from
 who=$(whoami) # current user
 mkdir "$execution_dir/logs"
 read -sp 'Password for sudo commands: ' pswd
+echo
 
 
 
