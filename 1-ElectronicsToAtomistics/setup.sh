@@ -34,7 +34,7 @@ mkdir "$execution_dir/logs"
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
 echo "Updating distro and including gcc, g++, gfortran, and make..."
 (set -x;
-    sudo apt-get -y update
+    echo $1 | sudo -S apt-get -y update
     sudo apt-get -y install pv gfortran build-essential
 )
 
@@ -62,7 +62,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     make all
 # show progress of make and write log
-) 2> "$execution_dir/logs/quantum_espresso_make.log" | pv -pterb --size 752541 > "$execution_dir/logs/quantum_espresso_make.log"
+) 2> "$execution_dir/logs/quantum_espresso_make.log" | pv -pterb --size 702733 > "$execution_dir/logs/quantum_espresso_make.log"
 
 # set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
 echo "Setting 'pw.x' as environment variable..."
@@ -76,7 +76,7 @@ echo "Updating environment variables for $who..."
 ### test execution of `EvA_EvV_plot.py`
 # for mpi dependency
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
-(set -x; sudo apt-get -y install quantum-espresso)
+(set -x; echo $1 | sudo -S apt-get -y install quantum-espresso)
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
@@ -94,7 +94,7 @@ cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
 (set -x; ./ev_curve fcc 3.628 2> /dev/null) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
-    sudo apt-get -y install python3-pip # install pip3
+    echo $1 | sudo -S apt-get -y install python3-pip # install pip3
     python3 -m pip install matplotlib numpy # install modules
     python3 "EvA_EvV_plot.py" # generate plots
 )
@@ -117,7 +117,7 @@ rm -r "temp/" # remove calculations temporary folder
 # install python2
 echo "Installing Python 2..."
 (set -x;
-    sudo add-apt-repository universe
+    echo $1 | sudo -S add-apt-repository universe
     sudo apt-get -y update
     sudo apt-get -y install python2 curl
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py

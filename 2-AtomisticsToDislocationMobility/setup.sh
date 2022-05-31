@@ -103,10 +103,10 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 # copy input data files to `../Calculations/2-MDDP/`
 cp "datain" "../Calculations/2-MDDP/"
 cp "data" "../Calculations/2-MDDP/"
-sudo apt-get install expect # allow execution of expect scripts
+echo $1 | sudo -S apt-get install expect # allow execution of expect scripts
 
 (set -x;
-    sudo apt-get -y install p7zip-full # get `7z` package
+    echo $1 | sudo -S apt-get -y install p7zip-full # get `7z` package
     7z x "MDDP.7z" # unarchive
 )
 # move into unarchived MDDP folder
