@@ -48,14 +48,14 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
 # show progress of untar and write log
-) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257353 > "$execution_dir/logs/quantum_espresso_untar.log"
+) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257293 > "$execution_dir/logs/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure`
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
 # show progress of configure and write log
-) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5813 > "$execution_dir/logs/quantum_espresso_configure.log"
+) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5559 > "$execution_dir/logs/quantum_espresso_configure.log"
 
 # `cd` into that extracted folder and execute `make all`
 (set -x;
@@ -76,7 +76,7 @@ echo "Updating environment variables for $who..."
 ### test execution of `EvA_EvV_plot.py`
 # for mpi dependency
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
-(set -x; sudo apt-get install quantum-espresso)
+(set -x; sudo apt-get -y install quantum-espresso)
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
@@ -94,7 +94,7 @@ cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
 (set -x; ./ev_curve fcc 3.628 2> /dev/null) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
-    sudo apt-get install python3-pip # install pip3
+    sudo apt-get -y install python3-pip # install pip3
     python3 -m pip install matplotlib numpy # install modules
     python3 "EvA_EvV_plot.py" # generate plots
 )
@@ -118,8 +118,8 @@ rm -r "temp/" # remove calculations temporary folder
 echo "Installing Python 2..."
 (set -x;
     sudo add-apt-repository universe
-    sudo apt-get update
-    sudo apt-get install python2 curl
+    sudo apt-get -y update
+    sudo apt-get -y install python2 curl
     curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
     sudo python2 get-pip.py
     pip2 --version

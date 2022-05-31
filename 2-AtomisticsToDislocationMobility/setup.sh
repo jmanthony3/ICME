@@ -106,7 +106,7 @@ cp "data" "../Calculations/2-MDDP/"
 sudo apt-get install expect # allow execution of expect scripts
 
 (set -x;
-    sudo apt-get install p7zip-full # get `7z` package
+    sudo apt-get -y install p7zip-full # get `7z` package
     7z x "MDDP.7z" # unarchive
 )
 # move into unarchived MDDP folder
