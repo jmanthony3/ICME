@@ -44,6 +44,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
     "$QUANTUM_ESPRESSO_INSTALL_LOC/"
 
 # unzip with `tar -xzvf qe-X.X.X.tar.gz`
+echo "Extracting tarball of $QUANTUM_ESPRESSO_VERSION..."
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
@@ -51,6 +52,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 ) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257293 > "$execution_dir/logs/quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure`
+echo "Configuring $QUANTUM_ESPRESSO_VERSION..."
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
@@ -58,6 +60,7 @@ cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
 ) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5559 > "$execution_dir/logs/quantum_espresso_configure.log"
 
 # `cd` into that extracted folder and execute `make all`
+echo "Making all of $QUANTUM_ESPRESSO_VERSION..."
 (set -x;
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     make all

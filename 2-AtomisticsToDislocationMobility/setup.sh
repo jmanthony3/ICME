@@ -56,6 +56,7 @@ mkdir "$OVITO_INSTALL_LOC"
 cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 # unzip with `tar xJfv ovito-basic-X.X.X-*.tar.xz`
 # show progress of untar and write log
+echo "Extracting tarball of $OVITO_VERSION..."
 (set -x;
     cd "$OVITO_INSTALL_LOC"
     tar xJfv "$OVITO_VERSION.tar.xz"
