@@ -34,7 +34,7 @@ mkdir "$execution_dir/logs"
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
 echo "Updating distro and including gcc, g++, gfortran, and make..."
 (set -x;
-    echo $1 | sudo -S apt-get -y update
+    (echo $1) 2> /dev/null | sudo -S apt-get -y update
     sudo apt-get -y install pv gfortran build-essential
 )
 
@@ -76,7 +76,7 @@ echo "Updating environment variables for $who..."
 ### test execution of `EvA_EvV_plot.py`
 # for mpi dependency
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
-(set -x; echo $1 | sudo -S apt-get -y install quantum-espresso)
+(set -x; (echo $1) 2> /dev/null | sudo -S apt-get -y install quantum-espresso)
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
@@ -94,7 +94,7 @@ cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
 (set -x; ./ev_curve fcc 3.628 2> /dev/null) # reference structure, lattice parameter
 echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 (set -x;
-    echo $1 | sudo -S apt-get -y install python3-pip # install pip3
+    (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
     python3 -m pip install matplotlib numpy # install modules
     python3 "EvA_EvV_plot.py" # generate plots
 )

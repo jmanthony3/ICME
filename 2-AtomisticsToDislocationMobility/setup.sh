@@ -59,7 +59,7 @@ cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 (set -x;
     cd "$OVITO_INSTALL_LOC"
     tar xJfv "$OVITO_VERSION.tar.xz"
-) 2> "$execution_dir/logs/ovito_untar.log" | pv -pterb --size 82293 >"$execution_dir/logs/ovito_untar.log"
+) 2> "$execution_dir/logs/ovito_untar.log" | pv -pterb --size 82228 >"$execution_dir/logs/ovito_untar.log"
 
 # # set `ovito` as environment variable; change PATH as needed to Ovito `/bin/` folder
 echo "Setting 'ovito' as environment variable..."
@@ -103,10 +103,10 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 # copy input data files to `../Calculations/2-MDDP/`
 cp "datain" "../Calculations/2-MDDP/"
 cp "data" "../Calculations/2-MDDP/"
-echo $1 | sudo -S apt-get install expect # allow execution of expect scripts
+(echo $1) 2> /dev/null | sudo -S apt-get -y install expect # allow execution of expect scripts
 
 (set -x;
-    echo $1 | sudo -S apt-get -y install p7zip-full # get `7z` package
+    (echo $1) 2> /dev/null | sudo -S apt-get -y install p7zip-full # get `7z` package
     7z x "MDDP.7z" # unarchive
 )
 # move into unarchived MDDP folder
