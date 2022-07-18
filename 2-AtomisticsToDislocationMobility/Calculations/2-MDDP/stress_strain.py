@@ -18,7 +18,7 @@ midpoint    = width / 2
 
 lattice_parameter = 2.781e-10 # m
 slip_direction = np.array([1, 1, 1])
-burger_vec = lattice_parameter*(nm.norms(slip_direction).l_two()/2)
+burger_vec = lattice_parameter*(nm.Norm(slip_direction).l_two()/2)
 print("Magnitude of Burger's vector, ||b|| = " + f"{burger_vec} m", end="\n\n")
 
 # must be same examined in `rescale_commands.sh`
