@@ -26,13 +26,6 @@ Joby M. Anthony III <jmanthony1@liberty.edu>
 
 // example variable
 // :fn-1: footnote:[]
-
-// // Python modules
-// <%!
-//     from engineering_notation import EngNumber as engr
-//     import numpy as np
-//     from pint import UnitRegistry as ureg
-// %>
 // end document metadata
 
 

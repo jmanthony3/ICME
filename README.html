@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="description" content="Scripts necessary to bridge certain length scales of Integrated Computational Materials Engineering design process.">
+<meta name="author" content="Joby M. Anthony III &lt;jmanthony1@liberty.edu&gt;">
+<title>Integrated Computational Materials Engineering</title>
+<style>
+/*! Copyright (C) 2019, TomTom (http://tomtom.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/* Extension of the AsciiDoctor CSS for AsciiDoxy.
+ * Adding:
+ * - Floating multipage navigation.
+ */
+@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
+@import "https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@2.0/data/stylesheets/asciidoctor-default.css";
+
+/* Multipage navigation */
+div#navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+div#navigation table {
+    margin-bottom: 0;
+}
+@media screen and (min-width: 768px) {
+    body.toc2 div#navigation {
+        left: 15em;
+    }
+    body.toc2.toc-right div#navigation {
+        right: 15em;
+    }
+}
+@media screen and (min-width: 1280px) {
+    body.toc2 div#navigation {
+        left: 20em;
+    }
+    body.toc2.toc-right div#navigation {
+        right: 20em;
+    }
+}
+
+</style>
+</head>
+<body class="article">
+<div id="header">
+<h1>Integrated Computational Materials Engineering</h1>
+<div class="details">
+<span id="author" class="author">Joby M. Anthony III &lt;jmanthony1@liberty.edu&gt;</span><br>
+<span id="revdate">May 16, 2022</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#sec-setup">Setup</a></li>
+<li><a href="#sec-electrons_to_atoms">1. Bridging Electronics to Atomistics</a>
+<ul class="sectlevel2">
+<li><a href="#sec-electrons-energy_offset">1.1. Energy Offset</a></li>
+<li><a href="#sec-electrons-kpoints">1.2. K-Point Study</a></li>
+<li><a href="#sec-electrons-gsfe">1.3. GSFE Curve</a></li>
+</ul>
+</li>
+<li><a href="#sec-dislocation_mobility">2. Bridging Atomistics to Dislocation Mobility</a></li>
+<li><a href="#_references">References</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="sec-setup">Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<div class="title">Abstract</div>
+<p>If host machine is Debian-based distro, then skip ahead to&#8230;&#8203;.
+Otherwise, setup a <a href="https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html">virtual (guest) machine</a> (VMware Workstation 16 Player) with an <a href="https://ubuntu.com/download/desktop">Ubuntu Desktop</a>.
+Afterward, clone this repository <code>git clone <a href="https://github.com/jmanthony3/ICME.git" class="bare">https://github.com/jmanthony3/ICME.git</a></code> wherever desired in guest machine.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sec-electrons_to_atoms">1. Bridging Electronics to Atomistics</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Using some Quantum Espresso flavor of choice, get the tarball of the desired <a href="https://github.com/QEF/q-e/releases">flavor</a> and put into <code>~/1-ElectronicsToAtomistics/Files/</code>.
+To install the Quantum Espresso environment, navigate to the directory of and execute the <code>~/1-ElectronicsToAtomistics/setup.sh</code> bash script.
+Regardless of existing packages on guest machine, this script will make the desired flavor of Quantum Espresso; update the <code>$PATH</code> environment variable; install the <code>cmake</code>, <code>gcc</code>, <code>gfortran</code>, and <code>make</code> capabilities; install Python 2; and, perform tests to demonstrate (hopeful) success of installing environment and executing scripts.</p>
+</div>
+<div class="paragraph">
+<p>Visit any of the following for a pseudopotential file of choice:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://pseudopotentiallibrary.org" class="bare">https://pseudopotentiallibrary.org</a></p>
+</li>
+<li>
+<p><a href="http://www.physics.rutgers.edu/gbrv/#Fe" class="bare">http://www.physics.rutgers.edu/gbrv/#Fe</a></p>
+</li>
+<li>
+<p><a href="https://www.materialscloud.org/discover/sssp/table/efficiency" class="bare">https://www.materialscloud.org/discover/sssp/table/efficiency</a></p>
+</li>
+<li>
+<p><a href="https://www.materialscloud.org/discover/sssp/table/precision" class="bare">https://www.materialscloud.org/discover/sssp/table/precision</a></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Place the desired pseudopotential file into <code>~/1-ElectronicsToAtomistics/Calculations/</code>: all scripts contained herein reference this pseudopotential file.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.quantum-espresso.org/Doc/INPUT_PW.html#idm200">Input description</a></p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="sec-electrons-energy_offset">1.1. Energy Offset</h3>
+<div class="paragraph">
+<p>Because every pseudopotential file uses different approximation schemes and methods, a calibrating calculation must be performed to ascertain the energy offset with respect to the embedding energy within an electron cloud.
+Navigate into <code>~/1-ElectronicsToAtomistics/Calculations/1-EnergyOffset</code> and execute the contained script: <code>./energy_offset.sh</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sec-electrons-kpoints">1.2. K-Point Study</h3>
+<div class="paragraph">
+<p>A similar process as that performed for mesh refinement studies must also be performed to determine the appropriate cutoff energy and number of k-points for QE calculations.
+This process must be performed for each pseudopotential file.
+Navigate into <code>~/1-ElectronicsToAtomistics/Calculations/2-KPointStudy</code> and execute the contained script: <code>./kpoint_study.sh</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sec-electrons-gsfe">1.3. GSFE Curve</h3>
+<div class="paragraph">
+<p>After determining which cutoff energy and number of k-points, navigate into <code>~/1-ElectronicsToAtomistics/Calculations/3-GSFE</code> and execute the script: <code>./gsfe_create.sh</code>.
+Upload to Rescale the contents of the <code>RescaleUpload</code> folder.
+If not existing already, create a <code>RescaleDownload</code> folder.
+Download the Rescale results into the <code>RescaleDownload</code> folder.
+Execute <code>./gsfe_process.sh</code>.
+The output <code>GSFE_SUMMARY-Calibration</code> file contains the target data for the MPCv4 calibration tool for the GSFE curve of the desired chemical system.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Category:Electronic_Scale.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Category:Electronic_Scale.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Evfit.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Evfit.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Ev_curve.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Ev_curve.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Calculation_of_elastic_constants.html#The_Script" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Calculation_of_elastic_constants.html#The_Script</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Surface_formation_energy_calculation_for_fcc_(111" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Surface_formation_energy_calculation_for_fcc_(111</a>),<em>(110)_and</em>(100).html
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/EvA_EvV_plot.py.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/EvA_EvV_plot.py.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Convergence_plots.py.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Convergence_plots.py.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_plot.py.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_plot.py.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_comp_plot.py.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/EOS_comp_plot.py.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Ecut_conv.py.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Ecut_conv.py.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/Gsfe_curve.html" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/Gsfe_curve.html</a>
+<a href="https://icme.hpc.msstate.edu/mediawiki/index.php/MPC.html#Build_LAMMPS.2BMEAM_for_MPCv4_on_Linux_with_MATLAB_R2017b_and_gcc-4.9.3" class="bare">https://icme.hpc.msstate.edu/mediawiki/index.php/MPC.html#Build_LAMMPS.2BMEAM_for_MPCv4_on_Linux_with_MATLAB_R2017b_and_gcc-4.9.3</a>
+<a href="https://www.youtube.com/watch?v=1YTUQm7xY60" class="bare">https://www.youtube.com/watch?v=1YTUQm7xY60</a>
+<a href="https://www.youtube.com/watch?v=4hgEv8C_KOw" class="bare">https://www.youtube.com/watch?v=4hgEv8C_KOw</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sec-dislocation_mobility">2. Bridging Atomistics to Dislocation Mobility</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://www.ovito.org/linux-downloads/" class="bare">https://www.ovito.org/linux-downloads/</a>
+<a href="https://gist.github.com/sakethramanujam/faf5b677b6505437dbdd82170ac55322" class="bare">https://gist.github.com/sakethramanujam/faf5b677b6505437dbdd82170ac55322</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+</div>
+</div>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+</body>
+</html>
