@@ -1,6 +1,6 @@
+.vscode/
+logs/
 __pycache__
-.vscode
 make
-README
+README/
 README.adoc.py
-rename_html.sh
