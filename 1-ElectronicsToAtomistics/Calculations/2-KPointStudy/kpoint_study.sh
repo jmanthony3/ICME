@@ -137,7 +137,7 @@ K_POINTS (automatic)
         cp "$input_filename.in" "../../0-Scripts/$REFERENCE_STRUCTURE.ev.in"
         rm -r "temp/" # remove calculations temporary folder
         cd "../../0-Scripts" # move into Scripts folder
-        gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
+        gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
         sed -i "s%pseudo_dir = '\.\./\.\./',%pseudo_dir = '\.\./'%" \
             "$REFERENCE_STRUCTURE.ev.in"
         # this outputs `evfit.4`: reference structure, lattice parameter

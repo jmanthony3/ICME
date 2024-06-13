@@ -188,7 +188,7 @@ cp "$input_filename.in" "../0-Scripts/$reference_structure.ev.in"
 
 # move to Scripts folder
 cd "../0-Scripts"
-gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
+gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
 # this outputs `evfit.4`: reference structure, lattice parameter
 ./ev_curve $reference_structure $LATTICE_PARAMETER 2> /dev/null
 python3 "EvA_EvV_plot.py" # generate plots
