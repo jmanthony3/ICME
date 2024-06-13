@@ -88,8 +88,8 @@ echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
     mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
-    # compiles `evfit.f` outputs `ev_curve`
-    gfortran -O2 "evfit.f" -o "evfit" 2> /dev/null
+    # compiles `evfit.f` outputs `evfit`
+    gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null
 )
 
 # create EvsA and EvsV curves
