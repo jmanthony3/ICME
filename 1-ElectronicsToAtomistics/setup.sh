@@ -104,8 +104,8 @@ echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 # move (in/out)put files to `./test/`
 mv "evfit" "./test/"
 mv "fcc.ev.in" "./test/"
-mv "EvsA" "./test/"
-mv "EvsV" "./test/"
+cp "EvsA" "./test/"
+cp "EvsV" "./test/"
 mv "SUMMARY" "./test/"
 mv "pw_ev.out" "./test/"
 mv "Name_of_EvA.pdf" "./test/"
@@ -143,6 +143,7 @@ rm -r "temp/" # remove calculations temporary folder
 
 
 ### populate `../Calculations/0-Scripts/`
+mkdir "$execution_dir/Calculations/0-Scripts"
 cp "ev_curve" "../Calculations/0-Scripts/"
 cp "EvA_EvV_plot.py" "../Calculations/0-Scripts/"
 cp "evfit.f" "../Calculations/0-Scripts/"

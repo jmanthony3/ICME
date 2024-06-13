@@ -47,8 +47,11 @@ Joby M. Anthony III <jmanthony1@liberty.edu>
 :!tabs:
 
 If host machine is Debian-based distro, then skip ahead to....
-Otherwise, setup a https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html[virtual (guest) machine] (VMware Workstation 16 Player) with an https://ubuntu.com/download/desktop[Ubuntu Desktop] or use https://docs.microsoft.com/en-us/windows/wsl/install[Windows Subsystem for Linux].
+Otherwise, if Windows 10/11, then either setup WSL or setup a https://www.vmware.com/products/workstation-player/workstation-player-evaluation.html[virtual (guest) machine] (VMware Workstation 16 Player) with an https://ubuntu.com/download/desktop[Ubuntu Desktop] or use https://docs.microsoft.com/en-us/windows/wsl/install[Windows Subsystem for Linux].
 Afterward, clone this repository `git clone https://github.com/jmanthony3/ICME.git` wherever desired inside the Linux distribution.
+
+If setting up WSL, then make sure that both "Virtual Machine Platform" and "Windows Subsystem for Linux" are checked.
+After restarting the machine, execute `wsl --install -d Ubuntu` from a command terminal.
 
 
 
