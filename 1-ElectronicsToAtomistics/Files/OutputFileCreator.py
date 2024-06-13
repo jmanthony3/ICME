@@ -175,8 +175,8 @@ def write_qe_inputs(lp, basis, layers, atoms):
 		f.write("\tprefix=''" + os.linesep)
 		f.write("\toutdir='temp'" + os.linesep)
 		f.write("\tpseudo_dir = '{}',".format(pp_dir) + os.linesep)
- 		f.write(' /' + os.linesep)
- 		# System section
+		f.write(' /' + os.linesep)
+		# System section
 		f.write(' &system' + os.linesep)
 		f.write('\tibrav= 0, nat= {}, ntyp= 1,'.format(layers) + os.linesep)
 		f.write('\tcelldm(1) ={0}, '.format(lp/au_to_ang) + os.linesep)  # Convert lattice parameter to a.u.
