@@ -35,7 +35,7 @@ mkdir "$execution_dir/logs"
 echo "Updating distro and including gcc, g++, gfortran, and make..."
 (set -x;
     (echo $1) 2> /dev/null | sudo -S apt-get -y update
-    sudo apt-get -y install pv gfortran build-essential
+    sudo apt-get -y install bc pv gfortran build-essential
 )
 
 # copy tarball into installation directory
@@ -104,8 +104,8 @@ echo "Ensuring pip3 capabilities for matplotlib and numpy..."
 # move (in/out)put files to `./test/`
 mv "evfit" "./test/"
 mv "fcc.ev.in" "./test/"
-cp "EvsA" "./test/"
-cp "EvsV" "./test/"
+mv "EvsA" "./test/"
+mv "EvsV" "./test/"
 mv "SUMMARY" "./test/"
 mv "pw_ev.out" "./test/"
 mv "Name_of_EvA.pdf" "./test/"
