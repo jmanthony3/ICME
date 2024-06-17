@@ -1,3 +1,4 @@
+# dirs/file to ignore
 .vscode/
 logs/
 __pycache__
@@ -5,6 +6,13 @@ make
 README/
 README.adoc.py
 *
+# do NOT ignore the following
+!index.html
+!LICENSE
+!README.adoc
+!README.bib
+!rename_html.sh
+!setup.sh
 # 1-ElectronicsToAtomistics
 !1-ElectronicsToAtomistics/Calculations/1-EnergyOffset/energy_offset.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/kpoint_study.sh
@@ -20,8 +28,11 @@ README.adoc.py
 !1-ElectronicsToAtomistics/Files/EvA_EvV_plot.py
 !1-ElectronicsToAtomistics/Files/evfit.f
 !1-ElectronicsToAtomistics/Files/gsfe_curve.py
+!1-ElectronicsToAtomistics/Files/gsfe_curve.jl
 !1-ElectronicsToAtomistics/Files/OutputFileCreator.py
+!1-ElectronicsToAtomistics/Files/OutputFileCreator.jl
 !1-ElectronicsToAtomistics/Files/OutputSummarizer.py
+!1-ElectronicsToAtomistics/Files/OutputSummarizer.jl
 !1-ElectronicsToAtomistics/Files/qe-6.0.0.tar.gz
 !1-ElectronicsToAtomistics/Files/rescale_commands.sh
 !1-ElectronicsToAtomistics/elastic_moduli.ipynb
