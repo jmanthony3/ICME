@@ -7,6 +7,8 @@
 QUANTUM_ESPRESSO_INSTALL_LOC=~/QuantumEspresso
 # encode name and version of tarball: qe-X.X.X
 QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
 # number of processors to use in test case
 NUM_PROC=$(nproc) # grabs all cores available by default
 
@@ -76,10 +78,25 @@ echo "Updating environment variables for $who..."
 (set -x; source ~/.bashrc)
 
 
-### test execution of `EvA_EvV_plot.py`
+### test execution of `EvA_EvV_plot`
 # for mpi dependency
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
 (set -x; (echo $1) 2> /dev/null | sudo -S apt-get -y install quantum-espresso)
+
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    echo "Installing Julia..."
+    (set -x; curl -fsSL https://install.julialang.org | sh)
+    (set -x; source ~/.bashrc)
+    echo "Adding necessary packages..."
+    (set -x; julia "packages.jl")
+elif [[ "$computing_language" == "python" ]]; then
+    # ibrav=3
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
@@ -95,12 +112,20 @@ echo "Executing QE according to Cu.in..."
 # create EvsA and EvsV curves
 cp "Cu.in" "fcc.ev.in" # create appropriate input file to `ev_curve`
 (set -x; ./ev_curve fcc 3.628 2> /dev/null) # reference structure, lattice parameter
-echo "Ensuring pip3 capabilities for matplotlib and numpy..."
-(set -x;
-    (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
-    python3 -m pip install matplotlib numpy # install modules
-    python3 "EvA_EvV_plot.py" # generate plots
-)
+if [[ "$computing_language" == "julia" ]]; then
+    (set -x; julia "EvA_EvV_plot.jl")
+elif [[ "$computing_language" == "python" ]]; then
+    echo "Ensuring pip3 capabilities for matplotlib and numpy..."
+    (set -x;
+        (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
+        python3 -m pip install matplotlib numpy # install modules
+        python3 "EvA_EvV_plot.py" # generate plots
+    )
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 # move (in/out)put files to `./test/`
 mv "evfit" "./test/"
 mv "fcc.ev.in" "./test/"
@@ -108,31 +133,40 @@ mv "EvsA" "./test/"
 mv "EvsV" "./test/"
 mv "SUMMARY" "./test/"
 mv "pw_ev.out" "./test/"
-mv "Name_of_EvA.pdf" "./test/"
-mv "Name_of_EvV.pdf" "./test/"
-mv "Name_of_Combined.pdf" "./test/"
+mv "Name_of_EvA.png" "./test/"
+mv "Name_of_EvV.png" "./test/"
+mv "Name_of_Combined.png" "./test/"
 mv "evfit.4" "./test/"
 mv "pw_ev.out" "./test/"
 rm -r "temp/" # remove calculations temporary folder
 
 
-### test execution of `gsfe_curve.py`
-# install python2
-echo "Installing Python 2..."
-(set -x;
-    echo $1 | sudo -S add-apt-repository universe
-    sudo apt-get -y update
-    sudo apt-get -y install python2 curl
-    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
-    sudo python2 get-pip.py
-    pip2 --version
-    pip2 install numpy
-)
-# python2 gsfe_curve.py: reference structure, lattice parameter, block motion
-(set -x; python2 "gsfe_curve.py" fcc 3.615 partial &)
+### test execution of `gsfe_curve`
+if [[ "$computing_language" == "julia" ]]; then
+    # julia gsfe_curve.jl: reference structure, lattice parameter, block motion
+    (set -x; julia "gsfe_curve.jl" fcc 3.615 partial &)
+elif [[ "$computing_language" == "python" ]]; then
+    # install python2
+    echo "Installing Python 2..."
+    (set -x;
+        echo $1 | sudo -S add-apt-repository universe
+        sudo apt-get -y update
+        sudo apt-get -y install python2 curl
+        curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+        sudo python2 get-pip.py
+        pip2 --version
+        pip2 install numpy
+    )
+    # python2 gsfe_curve.py: reference structure, lattice parameter, block motion
+    (set -x; python2 "gsfe_curve.py" fcc 3.615 partial &)
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 sleep 10s # let previous process spin up
 pid=$(pgrep pw.x) # get pid of `pw.x` process
-echo "Killing the 'gsfe_curve.py' process ('PID=$pid') \
+echo "Killing the 'gsfe_curve' process ('PID=$pid') \
     because this will take too long..."
 kill $pid
 # move (in/out)put files to `./test/`
@@ -147,9 +181,19 @@ mkdir "$execution_dir/Calculations/0-Scripts"
 cp "ev_curve" "../Calculations/0-Scripts/"
 cp "EvA_EvV_plot.py" "../Calculations/0-Scripts/"
 cp "evfit.f" "../Calculations/0-Scripts/"
-cp "gsfe_curve.py" "../Calculations/0-Scripts/"
-cp "OutputFileCreator.py" "../Calculations/0-Scripts/"
-cp "OutputSummarizer.py" "../Calculations/0-Scripts/"
+if [[ "$computing_language" == "julia" ]]; then
+    cp "gsfe_curve.jl" "../Calculations/0-Scripts/"
+    cp "OutputFileCreator.jl" "../Calculations/0-Scripts/"
+    cp "OutputSummarizer.jl" "../Calculations/0-Scripts/"
+elif [[ "$computing_language" == "python" ]]; then
+    cp "gsfe_curve.py" "../Calculations/0-Scripts/"
+    cp "OutputFileCreator.py" "../Calculations/0-Scripts/"
+    cp "OutputSummarizer.py" "../Calculations/0-Scripts/"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 
 
