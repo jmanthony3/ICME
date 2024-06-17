@@ -17,6 +17,7 @@ README.adoc.py
 !1-ElectronicsToAtomistics/Calculations/1-EnergyOffset/energy_offset.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/kpoint_study.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.py
+!1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.jl
 !1-ElectronicsToAtomistics/Calculations/3-GSFE/gsfe_create.sh
 !1-ElectronicsToAtomistics/Calculations/3-GSFE/gsfe_process.sh
 !1-ElectronicsToAtomistics/Calculations/Fe.library.meam
