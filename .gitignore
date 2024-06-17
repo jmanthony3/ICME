@@ -38,6 +38,7 @@ README.adoc.py
 !1-ElectronicsToAtomistics/Files/qe-6.0.0.tar.gz
 !1-ElectronicsToAtomistics/Files/rescale_commands.sh
 !1-ElectronicsToAtomistics/elastic_moduli.ipynb
+!1-ElectronicsToAtomistics/packages.jl
 !1-ElectronicsToAtomistics/setup.sh
 # 2-AtomisticsToDislocations
 !2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_position.py
