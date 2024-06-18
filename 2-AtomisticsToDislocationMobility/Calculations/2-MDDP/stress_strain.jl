@@ -1,12 +1,10 @@
-import joby_m_anthony_iii.numerical_methods as nm
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import pandas as pd
-import warnings
-warnings.filterwarnings(action="ignore", module="numpy/*", message="Empty input file", category=UserWarning)
+using CSV
+using DataFrames
+using LinearAlgebra: norm
+using NumericalMethods
+using Plots
 
-filepath = os.path.dirname(os.path.abspath(__file__))
+filepath = pwd()
 
 print("")
 
@@ -17,56 +15,51 @@ R_buff      = width - offset
 midpoint    = width / 2
 
 lattice_parameter = 2.7810811e-10 # m
-slip_direction = np.array([1, 1, 1])
-burger_vec = lattice_parameter*(nm.Norm(slip_direction).l_two()/2)
-print("Magnitude of Burger's vector, ||b|| = " + f"{burger_vec} m", end="\n\n")
+slip_direction = [1, 1, 1]
+burger_vec = lattice_parameter * (norm(slip_direction) / 2.)
+println("Magnitude of Burger's vector, ||b|| = $burger_vec m\n")
 
 # must be same examined in `rescale_commands.sh`
-TEMP = np.array([300]) # np.arange(150, 550, 50) # K
-STRAIN = np.array([3], dtype=int) # np.arange(1, 7, 1) # 1/s
-# for s in np.array([-3, -2, -1]):
-#     STRAIN = np.append(STRAIN, s)
-STRAIN = 10**STRAIN
+TEMP = [300] # range(150, 500, 50) # K
+STRAIN = [3] # range(1, 6, 1) # 1/s
+# for s in [-3, -2, -1]:
+#     push!(STRAIN, s)
+# end
+STRAIN .^= 10.
 
-skip = int(1.5e2)
+skip = 150
 columns = ["timenow", "disDensity", "Stress", "Strain", "S1", "S2", "S3", "S23", "S31", "S12", "p1", "p2", "p3", "p23", "p31",  "p12", "jogs", "junctions", "CrossSlip"]
 
-do_monitor = True
+do_monitor = true
 
-if do_monitor:
-    fig, ax = plt.subplots(1, 1)
-    ax.set(
+if do_monitor
+    data = CSV.read("$filepath/DDtimeResults.out", DataFrame; header=columns, skipto=5)
+    ax = scatter(
+        data[!, "Strain"][1:skip:end],
+        data[!, "Stress"][1:skip:end] ./ 1e6, # MPa
+        # label="$strain \$\\frac{1}{s}\$")
+        # xscale=:log10,
+        xlabel="True Strain (\$\\epsilon\$)",
+        # yscale=:log10,
+        ylabel="True Stress (\$\\sigma\$) [\$MPa\$]",
         title="Stress-Strain Curve",
-        # xscale="symlog",
-        xlabel="True Strain (" + r"$\epsilon$)",
-        # yscale="symlog",
-        ylabel="True Stress (" + r"$\sigma$) [$MPa$]",
     )
-    with open(f"{filepath}/DDtimeResults.out", "r") as f:
-        data = pd.DataFrame(np.genfromtxt(f.readlines()[4:]), columns=columns)
-        ax.scatter(
-            np.array([data["Strain"][i] for i in range(0, len(data), skip)]),
-            np.array([data["Stress"][i] for i in range(0, len(data), skip)])/1e6, # MPa
-            # label=f"{strain} " + r"$\frac{1}{s}$")
-        )
-    # ax.legend()
-    fig.savefig(f"stress_strain-monitor.svg")
-else:
-    for temp in TEMP:
-        fig, ax = plt.subplots(1, 1)
-        ax.set(
-            title=f"Stress-Strain @ {temp}" + r"[$K$]",
-            # xscale="symlog",
-            xlabel="True Strain (" + r"$\epsilon$)",
-            # yscale="symlog",
-            ylabel="True Stress (" + r"$\sigma$) [$MPa$]",
-        )
-        for strain in STRAIN:
-            with open(f"{filepath}/{temp}/{strain}/DDtimeResults.out", "r") as f:
-                data = pd.DataFrame(np.genfromtxt(f.readlines()[4:]), columns=columns)
-                ax.scatter(
-                    np.array([data["Strain"][i] for i in range(0, len(data), skip)]),#/data["Strain"].values[-1],
-                    np.array([data["Stress"][i] for i in range(0, len(data), skip)])/1e6, # MPa
-                    label=r"$\epsilon_{f}$ = " + f"{data['Strain'].values[-1]} @ " + r"$\dot{\epsilon}$ = " + f"{strain} " + r"$\frac{1}{s}$")
-        ax.legend()
-        fig.savefig(f"{filepath}/stress_strain-{temp}.svg")
+    savefig(ax, "stress_strain-monitor.png")
+else
+    for temp in TEMP
+        ax = plot(
+            # xscale=:log10,
+            xlabel="True Strain (\$\\epsilon\$)",
+            # yscale:log10,
+            ylabel="True Stress (\$\\sigma\$) [\$MPa\$]",
+            title="Stress-Strain @ $temp [\$K\$]",)
+        for strain in STRAIN
+            data = CSV.read("$filepath/$temp/$strain/DDtimeResults.out", DataFrame; header=columns, skipto=5)
+            scatter!(ax,
+                data["Strain"][1:skip:end], # ./ last(data[!, "Strain"]),
+                data["Stress"][1:skip:end] ./ 1e6, # MPa
+                label="\$\\epsilon_{f}\$ = $(last(data[!, "Strain"])) @ \$\\dot{\\epsilon}\$ = $strain \$\\frac{1}{s}\$")
+        end
+        savefig(ax, "$filepath/stress_strain-$temp.png")
+    end
+end
