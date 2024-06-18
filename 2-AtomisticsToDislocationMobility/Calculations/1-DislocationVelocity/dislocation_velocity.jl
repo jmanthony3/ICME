@@ -13,7 +13,7 @@ L_buff      = 0.0 + offset
 R_buff      = width - offset
 midpoint    = width / 2
 
-lattice_parameter = 2.781e-10 # m
+lattice_parameter = 2.7810811e-10 # m
 slip_direction = [1, 1, 1]
 burger_vec = lattice_parameter * (norm(slip_direction) / 2.)
 println("Magnitude of Burger's vector, ||b|| = $burger_vec m\n")
