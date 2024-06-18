@@ -8,7 +8,7 @@
 #####################################################################################
 
 using Dates
-using LinearAlgebra: norm
+using LinearAlgebra: cross, norm
 
 
 #

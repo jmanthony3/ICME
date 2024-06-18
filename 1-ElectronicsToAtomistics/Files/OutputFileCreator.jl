@@ -8,7 +8,7 @@
 #####################################################################################
 
 using Dates
-using LinearAlgebra: norm
+using LinearAlgebra: cross, norm
 
 
 #
@@ -250,7 +250,7 @@ function gsfe(structure, lp, slip_system=nothing)
     end
 
     # initialize the lists for the energy values
-    energy = []; for d in fault_points
+    energy = []; for (filecount, d) in enumerate(fault_points)
         # create the stacking fault structure
         area, fault_length, natoms = create_stackingfault(structure, lp, stacking_layers, d, slip_system)
 
