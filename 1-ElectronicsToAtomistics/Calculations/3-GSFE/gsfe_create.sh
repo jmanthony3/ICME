@@ -188,7 +188,7 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 ### execute QE with input parameters
 echo "Executing QE according to $input_filename.in..."
 (set -x;
-    mpirun -np $NUM_PROC pw.x -i "$input_filename.in" \
+    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
         > "$input_filename.out" 2> /dev/null
 )
 rm -r "temp/" # remove calculations temporary folder

@@ -279,7 +279,7 @@ function gsfe(structure, lp, slip_system=nothing)
         end
         # `cp gsfe.in ./input_gens/gsfe_$filenum.in`
         # open("RE_comm.cm", "a") do f
-        #     println(f, "mpirun -np 16 pw.x -i gsfe_$filenum.in > gsfe_$filenum.out")
+        #     println(f, "mpirun -np 16 pw.x -in gsfe_$filenum.in > gsfe_$filenum.out")
         # end
         filenum += 1
     end
@@ -288,8 +288,8 @@ end # end gsfe
 
 function run_qe(filenum)
     # run quantum espresso
-    # run(Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-i", "gsfe.in", " > ", "gsfe.out"]))
-    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-i", "gsfe.in"])
+    # run(Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
+    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in"])
     run(pipeline(cmd_runqe, stdout="gsfe.out"))
 
     # get energy
