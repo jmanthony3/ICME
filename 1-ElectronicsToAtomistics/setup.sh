@@ -28,6 +28,16 @@ set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
 who=$(whoami) # current user
 mkdir "$execution_dir/logs"
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    cl_ext="jl"
+elif [[ "$computing_language" == "python" ]]; then
+    cl_ext="py"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
@@ -83,19 +93,13 @@ echo "Updating environment variables for $who..."
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
 (set -x; (echo $1) 2> /dev/null | sudo -S apt-get -y install quantum-espresso)
 
-computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
 if [[ "$computing_language" == "julia" ]]; then
     echo "Installing Julia..."
     (set -x; curl -fsSL https://install.julialang.org | sh)
+    echo "Updating environment variables for $who..."
     (set -x; source ~/.bashrc)
     echo "Adding necessary packages..."
     (set -x; julia "packages.jl")
-elif [[ "$computing_language" == "python" ]]; then
-    # ibrav=3
-else
-    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
-        not understood. Must be either 'Julia' or 'Python'."
-    exit
 fi
 
 # navigate back to appropriate directory
@@ -104,7 +108,7 @@ mkdir "test" # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
-    mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
+    mpirun -np $NUM_PROC pw.x -i "Cu.in" > "./test/Cu.out" 2> /dev/null
     # compiles `evfit.f` outputs `evfit`
     gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null
 )
@@ -164,7 +168,7 @@ else
         not understood. Must be either 'Julia' or 'Python'."
     exit
 fi
-sleep 10s # let previous process spin up
+sleep 30s # let previous process spin up
 pid=$(pgrep pw.x) # get pid of `pw.x` process
 echo "Killing the 'gsfe_curve' process ('PID=$pid') \
     because this will take too long..."
@@ -179,21 +183,11 @@ rm -r "temp/" # remove calculations temporary folder
 ### populate `../Calculations/0-Scripts/`
 mkdir "$execution_dir/Calculations/0-Scripts"
 cp "ev_curve" "../Calculations/0-Scripts/"
-cp "EvA_EvV_plot.py" "../Calculations/0-Scripts/"
+cp "EvA_EvV_plot.$cl_ext" "../Calculations/0-Scripts/"
 cp "evfit.f" "../Calculations/0-Scripts/"
-if [[ "$computing_language" == "julia" ]]; then
-    cp "gsfe_curve.jl" "../Calculations/0-Scripts/"
-    cp "OutputFileCreator.jl" "../Calculations/0-Scripts/"
-    cp "OutputSummarizer.jl" "../Calculations/0-Scripts/"
-elif [[ "$computing_language" == "python" ]]; then
-    cp "gsfe_curve.py" "../Calculations/0-Scripts/"
-    cp "OutputFileCreator.py" "../Calculations/0-Scripts/"
-    cp "OutputSummarizer.py" "../Calculations/0-Scripts/"
-else
-    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
-        not understood. Must be either 'Julia' or 'Python'."
-    exit
-fi
+cp "gsfe_curve.$cl_ext" "../Calculations/0-Scripts/"
+cp "OutputFileCreator.$cl_ext" "../Calculations/0-Scripts/"
+cp "OutputFileSummarizer.$cl_ext" "../Calculations/0-Scripts/"
 cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 
 

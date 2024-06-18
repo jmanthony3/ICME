@@ -28,6 +28,8 @@ KPOINTS_SHIFT=( # shift of `KPOINTS` in some direction
     0 # y
     0 # z
 )
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
 NUM_PROC=$(nproc) # grabs all cores available by default
 
 
@@ -45,7 +47,7 @@ ENERGY_OFFSET=4479.47132505 # [Ry]
 
 
 
-##################### `OutputFileCreator.py` ##################
+###################### `OutputFileCreator` ####################
 DISLOCATION_GRADE="full"
 
 
@@ -61,6 +63,16 @@ DISLOCATION_GRADE="full"
 
 
 set +x # turn script tracing off
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    cl_ext="jl"
+elif [[ "$computing_language" == "python" ]]; then
+    cl_ext="py"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
@@ -115,12 +127,12 @@ echo "========================================"
 sed -i "64s%^[[:digit:]]*[^ #]%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
-### automatically define other `EvA_EvV_plot.py` file variables from inputs
+### automatically define other `EvA_EvV_plot` file variables from inputs
 sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" \
-    "../0-Scripts/EvA_EvV_plot.py"
+    "../0-Scripts/EvA_EvV_plot.$cl_ext"
 
 
-### automatically define other `OutputFileCreator.py` file variables from inputs
+### automatically define other `OutputFileCreator` file variables from inputs
 dislocation_grade=$(echo $DISLOCATION_GRADE | tr '[:upper:]' '[:lower:]')
 if [[ "$dislocation_grade" == "full" ]]; then
     disp_scale=$(echo "scale=9; sqrt(3) / 2" | bc)
@@ -134,41 +146,41 @@ else
     exit
 fi
 
-# modify `OutputFileCreator.py` script
+# modify `OutputFileCreator` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]%el_weight = $ELEMENT_AMU%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^kpoints = [[:digit:]]*[^ #]%kpoints = $KPOINT%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" \
-    "../0-Scripts/OutputFileCreator.py"
+    "../0-Scripts/OutputFileCreator.$cl_ext"
 
-# modify `OutputSummarizer.py` script
+# modify `OutputFileSummarizer` script
 sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^el_weight = [[:digit:]]*\.*[[:digit:]]*[^ #]%el_weight = $ELEMENT_AMU%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^energy_cutoff = [[:digit:]]*\.*[[:digit:]]*\*13.6057[^ #]%energy_cutoff = $CUTOFF_ENERGY\*13.6057%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^kpoints = [[:digit:]]*[^ #]%kpoints = $KPOINT%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%f.write(\"mixing_mode ='local-TF', electron_maxstep = [[:digit:]]*,\" + os.linesep)%f.write(\"mixing_mode ='local-TF', electron_maxstep = $MAX_ITER,\" + os.linesep)%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.000001,\" + os.linesep)%f.write(\"mixing_beta = $MIXING_BETA, conv_thr = 0.000001,\" + os.linesep)%" \
-    "../0-Scripts/OutputSummarizer.py"
+    "../0-Scripts/OutputFileSummarizer.$cl_ext"
 
 
 
@@ -176,7 +188,7 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
 ### execute QE with input parameters
 echo "Executing QE according to $input_filename.in..."
 (set -x;
-    mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
+    mpirun -np $NUM_PROC pw.x -i "$input_filename.in" \
         > "$input_filename.out" 2> /dev/null
 )
 rm -r "temp/" # remove calculations temporary folder
@@ -191,7 +203,15 @@ cd "../0-Scripts"
 gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
 # this outputs `evfit.4`: reference structure, lattice parameter
 ./ev_curve $reference_structure $LATTICE_PARAMETER 2> /dev/null
-python3 "EvA_EvV_plot.py" # generate plots
+if [[ "$computing_language" == "julia" ]]; then
+    julia "EvA_EvV_plot.jl" # generate plots
+elif [[ "$computing_language" == "python" ]]; then
+    python3 "EvA_EvV_plot.py" # generate plots
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 # move all output files back to working directory
 mv "$reference_structure.ev.in" "../3-GSFE/"
@@ -201,9 +221,9 @@ mv "EvsV" "../3-GSFE/"
 mv "SUMMARY" "../3-GSFE/"
 mv "evfit.4" "../3-GSFE/"
 mv "pw_ev.out" "../3-GSFE/"
-mv "Name_of_EvA.pdf" "../3-GSFE/"
-mv "Name_of_EvV.pdf" "../3-GSFE/"
-mv "Name_of_Combined.pdf" "../3-GSFE/"
+mv "Name_of_EvA.png" "../3-GSFE/"
+mv "Name_of_EvV.png" "../3-GSFE/"
+mv "Name_of_Combined.png" "../3-GSFE/"
 rm -r "temp/" # remove calculations temporary folder
 
 
@@ -243,14 +263,14 @@ sed -i "s%^Equilibrium Energy per Atom    = \-[[:digit:]]*\.[[:digit:]]*%Equilib
     "SUMMARY"
 # get lattice parameter [angstrom]
 lattice_parameter=$(sed -n "s%^Equilibrium lattice constant   = %%p" "SUMMARY")
-# replace in `2-AtomisticsToDislocationMobility/1-DislocationVelocity/dislocation_velocity.py`
+# replace in `2-AtomisticsToDislocationMobility/1-DislocationVelocity/dislocation_velocity`
 # 1 [angstrom] = 1e-10 [m]
 sed -i "s%^lattice_parameter = [[:digit:]\.e\-]*[^ #]%lattice_parameter = ${lattice_parameter}e\-10%" \
-    "../../../2-AtomisticsToDislocationMobility/Calculations/1-DislocationVelocity/dislocation_velocity.py"
-# replace in `2-AtomisticsToDislocationMobility/2-MDDP/stress_strain.py`
+    "../../../2-AtomisticsToDislocationMobility/Calculations/1-DislocationVelocity/dislocation_velocity.$cl_ext"
+# replace in `2-AtomisticsToDislocationMobility/2-MDDP/stress_strain`
 # 1 [angstrom] = 1e-10 [m]
 sed -i "s%^lattice_parameter = [[:digit:]\.e\-]*[^ #]%lattice_parameter = ${lattice_parameter}e\-10%" \
-    "../../../2-AtomisticsToDislocationMobility/Calculations/1-MDDP/stress_strain.py"
+    "../../../2-AtomisticsToDislocationMobility/Calculations/2-MDDP/stress_strain.$cl_ext"
 # previous bulk modulus [kbar]
 bulk=$(sed -n "s%^Bulk Modulus (kbar)            = %%p" "SUMMARY")
 # convert to [GPa]
@@ -273,10 +293,23 @@ mkdir "RescaleDownload" 2> /dev/null
 # move into Scripts directory
 cd "../0-Scripts/"
 mkdir "input_gens" # subsequent script places inputs here
-(set -x;
-    # python2 OutputFileCreator.py: reference structure, lattice parameter, block motion
-    python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade
-)
+echo "                                                        "
+echo "                                                        "
+if [[ "$computing_language" == "julia" ]]; then
+    (set -x;
+        # julia OutputFileCreator.jl: reference structure, lattice parameter, block motion
+        julia "OutputFileCreator.jl" $reference_structure $LATTICE_PARAMETER $dislocation_grade
+    )
+elif [[ "$computing_language" == "python" ]]; then
+    (set -x;
+        # python2 OutputFileCreator.py: reference structure, lattice parameter, block motion
+        python2 "OutputFileCreator.py" $reference_structure $LATTICE_PARAMETER $dislocation_grade
+    )
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 # move (in/out)put files to `../3-GSFE/RescaleUpload/`
 mv "input_gens/"* "../3-GSFE/RescaleUpload/"
 rm -r "input_gens/"

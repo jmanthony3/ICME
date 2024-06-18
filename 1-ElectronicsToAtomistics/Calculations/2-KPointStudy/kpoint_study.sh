@@ -48,6 +48,16 @@ ENERGY_OFFSET=4473.05298206 # [Ry]
 
 
 set +x # turn script tracing off
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    cl_ext="jl"
+elif [[ "$computing_language" == "python" ]]; then
+    cl_ext="py"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
@@ -72,9 +82,9 @@ lattice_parameter_bohr=$(echo "$LATTICE_PARAMETER*1.88973" | bc -l)
 sed -i "64s%^[[:digit:]]*[^ #]%$EQ_OF_STATE%" "../0-Scripts/ev_curve"
 
 
-### automatically define other `EvA_EvV_plot.py` file variables from inputs
+### automatically define other `EvA_EvV_plot` file variables from inputs
 sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $ENERGY_OFFSET%" \
-    "../0-Scripts/EvA_EvV_plot.py"
+    "../0-Scripts/EvA_EvV_plot.$cl_ext"
 
 
 
@@ -142,7 +152,15 @@ K_POINTS (automatic)
             "$REFERENCE_STRUCTURE.ev.in"
         # this outputs `evfit.4`: reference structure, lattice parameter
         ./ev_curve $REFERENCE_STRUCTURE $LATTICE_PARAMETER 2>/dev/null
-        python3 "EvA_EvV_plot.py" # generate plots
+        if [[ "$computing_language" == "julia" ]]; then
+            julia "EvA_EvV_plot.jl" # generate plots
+        elif [[ "$computing_language" == "python" ]]; then
+            python3 "EvA_EvV_plot.py" # generate plots
+        else
+            echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+                not understood. Must be either 'Julia' or 'Python'."
+            exit
+        fi
         # move all output files back to `cutoff_energy` directory
         # create appropriate input file to `ev_curve`
         mv "$REFERENCE_STRUCTURE.ev.in" "../2-KPointStudy/$cutoff_energy/"
@@ -152,9 +170,9 @@ K_POINTS (automatic)
         mv "SUMMARY" "../2-KPointStudy/$cutoff_energy/SUMMARY.$cutoff_energy.$K"
         mv "evfit.4" "../2-KPointStudy/$cutoff_energy/"
         mv "pw_ev.out" "../2-KPointStudy/$cutoff_energy/"
-        mv "Name_of_EvA.pdf" "../2-KPointStudy/$cutoff_energy/"
-        mv "Name_of_EvV.pdf" "../2-KPointStudy/$cutoff_energy/"
-        mv "Name_of_Combined.pdf" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_EvA.png" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_EvV.png" "../2-KPointStudy/$cutoff_energy/"
+        mv "Name_of_Combined.png" "../2-KPointStudy/$cutoff_energy/"
         rm -r "temp/" # remove calculations temporary folder
 
         ### post-process output files
@@ -213,7 +231,15 @@ done # end of study
 
 
 ### visualize data files
-python3 "which_ecutwfc.py" # generate plots
+if [[ "$computing_language" == "julia" ]]; then
+    julia "which_ecutwfc.jl" # generate plots
+elif [[ "$computing_language" == "python" ]]; then
+    python3 "which_ecutwfc.py" # generate plots
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 

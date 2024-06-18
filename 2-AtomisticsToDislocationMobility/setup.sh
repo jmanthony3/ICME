@@ -7,6 +7,9 @@
 OVITO_INSTALL_LOC=~/Ovito
 # encode name and version of tarball
 OVITO_VERSION="ovito-basic-3.7.2-x86_64"
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
+# number of processors to use in test case
 NUM_PROC=$(nproc) # grabs all cores available by default
 
 
@@ -93,9 +96,25 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 
 
 ### get python3 packages for future scripts
-(set -x;
-    python3 -m pip install engineering_notation joby_m_anthony_iii ovito pandas sympy
-)
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    echo "Installing Julia..."
+    (set -x; curl -fsSL https://install.julialang.org | sh)
+    echo "Updating environment variables for $who..."
+    (set -x; source ~/.bashrc)
+    echo "Adding necessary packages..."
+    (set -x; julia "packages.jl")
+    echo "Adding Ovito's Python API to manipulate data files..."
+    (set -x; python3 -m pip install ovito)
+elif [[ "$computing_language" == "python" ]]; then
+    (set -x;
+        python3 -m pip install engineering_notation joby_m_anthony_iii ovito pandas sympy
+    )
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
