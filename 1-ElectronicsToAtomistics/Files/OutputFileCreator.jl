@@ -52,7 +52,7 @@ relax = false
 # Number or location of simulated points. It MUST start with 0.
 #fault_points = [0.0, 1./4., 1./2.]
 # fault_points = np.linspace(0,1,16)
-fault_points = range(0, 16; step=1)
+fault_points = range(1, 16; step=1)
 # Size of vacuum in Ang.
 vacuum = 20.0
 # Number of stacking layers - CAREFUL, DFT scales very poorly with more atoms
@@ -277,8 +277,8 @@ function gsfe(structure, lp, slip_system=nothing)
         #     # write the normalized displacement and the relaxed and static energies in mJ/m**2
         #     println(f, "$(d*fault_length)\t$((last(energy) - first(energy)) * 1.60217733e-19 * 1e23 / area)\t$walltime ")
         # end
-        `mkdir "./input_gens"`
-        `cp gsfe.in ./input_gens/gsfe_$filecount.in`
+        !(isdir("./input_gens")) ? mkdir("./input_gens") : nothing
+        cp("gsfe.in", "./input_gens/gsfe_$filecount.in")
         open("RE_comm.cm", "a") do f
             println(f, "mpirun -np 16 pw.x -i gsfe_$filecount.in > gsfe_$filecount.out")
         end
