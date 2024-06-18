@@ -50,8 +50,8 @@ EvsV_fn         = "Name_of_EvV.png"
 EvsA_EvsV_fn    = "Name_of_Combined.png"
 
 # path to data files
-EvsA_df = CSV.read("EvsA", DataFrame)
-EvsV_df = CSV.read("EvsV", DataFrame)
+EvsA_df = CSV.read("EvsA", DataFrame; header=false, delim=' ', types=Float64)
+EvsV_df = CSV.read("EvsV", DataFrame; header=false, delim=' ', types=Float64)
 
 
 #######################################################
