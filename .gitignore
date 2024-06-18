@@ -13,7 +13,7 @@ README.adoc.py
 !README.bib
 !rename_html.sh
 !setup.sh
-# 1-ElectronicsToAtomistics
+## 1-ElectronicsToAtomistics
 !1-ElectronicsToAtomistics/Calculations/1-EnergyOffset/energy_offset.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/kpoint_study.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.jl
@@ -40,8 +40,10 @@ README.adoc.py
 !1-ElectronicsToAtomistics/elastic_moduli.ipynb
 !1-ElectronicsToAtomistics/packages.jl
 !1-ElectronicsToAtomistics/setup.sh
-# 2-AtomisticsToDislocations
+## 2-AtomisticsToDislocations
+!2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_position.jl
 !2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_position.py
+!2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_velocity.jl
 !2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_velocity.py
 !2-AtomisticsToDislocations/Calculations/1-DislocationVelocity/dislocation_velocity.sh
 !2-AtomisticsToDislocations/Calculations/2-MDDP/bcc.sh
@@ -64,8 +66,9 @@ README.adoc.py
 !2-AtomisticsToDislocations/Files/rescale_commands.sh
 !2-AtomisticsToDislocations/packages.jl
 !2-AtomisticsToDislocations/setup.sh
-# 3-DislocationMobilityToCrystalPlasticity
+## 3-DislocationMobilityToCrystalPlasticity
 !3-DislocationMobilityToCrystalPlasticity/Calculations/1-CPFEM/cpfem.sh
+!3-DislocationMobilityToCrystalPlasticity/Calculations/1-CPFEM/voce_hardening_fit.jl
 !3-DislocationMobilityToCrystalPlasticity/Calculations/1-CPFEM/voce_hardening_fit.py
 !3-DislocationMobilityToCrystalPlasticity/Files/bcc.sx
 !3-DislocationMobilityToCrystalPlasticity/Files/fcc.sx
