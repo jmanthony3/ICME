@@ -50,7 +50,7 @@ if do_monitor:
             # label=f"{strain} " + r"$\frac{1}{s}$")
         )
     # ax.legend()
-    fig.savefig(f"stress_strain-monitor.svg")
+    fig.savefig(f"stress_strain-monitor.png")
 else:
     for temp in TEMP:
         fig, ax = plt.subplots(1, 1)
@@ -69,4 +69,4 @@ else:
                     np.array([data["Stress"][i] for i in range(0, len(data), skip)])/1e6, # MPa
                     label=r"$\epsilon_{f}$ = " + f"{data['Strain'].values[-1]} @ " + r"$\dot{\epsilon}$ = " + f"{strain} " + r"$\frac{1}{s}$")
         ax.legend()
-        fig.savefig(f"{filepath}/stress_strain-{temp}.svg")
+        fig.savefig(f"{filepath}/stress_strain-{temp}.png")

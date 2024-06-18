@@ -54,7 +54,7 @@ fig.legend([ax1, ax2], # The line objects
     title="Cutoff Energies" # Title for the legend
 )
 plt.subplots_adjust(bottom=0.225)
-plt.savefig("./energy_versus_kpoint.svg")
+plt.savefig("./energy_versus_kpoint.png")
 
 
 
@@ -104,7 +104,7 @@ fig.legend([ax1, ax2], # The line objects
     title="Cutoff Energies" # Title for the legend
 )
 plt.subplots_adjust(bottom=0.225)
-plt.savefig("./alat_versus_kpoint.svg")
+plt.savefig("./alat_versus_kpoint.png")
 
 
 
@@ -152,7 +152,7 @@ fig.legend([ax1, ax2], # The line objects
     title="Cutoff Energies" # Title for the legend
 )
 plt.subplots_adjust(bottom=0.225)
-plt.savefig("./bulk_versus_kpoint.svg")
+plt.savefig("./bulk_versus_kpoint.png")
 
 
 
@@ -200,7 +200,7 @@ fig.legend([ax1, ax2], # The line objects
     title="Cutoff Energies" # Title for the legend
 )
 plt.subplots_adjust(bottom=0.225)
-plt.savefig("./convergence_versus_kpoint.svg")
+plt.savefig("./convergence_versus_kpoint.png")
 
 
 
@@ -256,4 +256,4 @@ plt.savefig("./convergence_versus_kpoint.svg")
 #     title="Cutoff Energies" # Title for the legend
 # )
 # plt.subplots_adjust(bottom=0.225)
-# plt.savefig("{filepath}/EvsA_for_energy.svg")
+# plt.savefig("{filepath}/EvsA_for_energy.png")

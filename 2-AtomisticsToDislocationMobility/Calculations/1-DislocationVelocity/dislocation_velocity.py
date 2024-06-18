@@ -122,14 +122,14 @@ try:
             ax_sigma.legend(
                 title=r"$x(t) = v[\frac{nm}{ps}]*t[ps] + [nm]$"
             )
-            fig_sigma.savefig(f"position_for_time-{temp}.svg")
+            fig_sigma.savefig(f"position_for_time-{temp}.png")
         with open(f"dislocation_velocity-{temp}", "r") as f:
             data = pd.DataFrame(np.genfromtxt(f.readlines())[1:], columns=["Stress", "Velocity"])
             drag = burger_vec/float(str(nm.least_squares.linear(data['Stress'][:12], data['Velocity'][:12], 1)[0](sp.Symbol('t'))).split('*')[0])*1e6 # Pa-s
             DRAG[f"{temp}"] = (drag, 1/drag)
             ax_temp.scatter(data["Stress"], data["Velocity"], label=f"{temp} K" + r"$\rightarrow$ B = " + f"{drag:3e}" + r" Pa-s")
         ax_temp.legend()
-        fig_temp.savefig(f"velocity_for_stress.svg")
+        fig_temp.savefig(f"velocity_for_stress.png")
 finally:
     sys.stdout.close()
     sys.stdout = old_stdout

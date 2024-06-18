@@ -224,9 +224,9 @@ else
     mv "SUMMARY" "../3-GSFE/"
     mv "evfit.4" "../3-GSFE/"
     mv "pw_ev.out" "../3-GSFE/"
-    mv "Name_of_EvA.pdf" "../3-GSFE/"
-    mv "Name_of_EvV.pdf" "../3-GSFE/"
-    mv "Name_of_Combined.pdf" "../3-GSFE/"
+    mv "Name_of_EvA.png" "../3-GSFE/"
+    mv "Name_of_EvV.png" "../3-GSFE/"
+    mv "Name_of_Combined.png" "../3-GSFE/"
     rm -r "temp/" # remove calculations temporary folder
 
 

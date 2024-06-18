@@ -1,6 +1,6 @@
 # The purpose of this code is to create plots for any set of EvsA and EvsV data
 # It should be ran from a directory that has EvsA and EvsV data in it
-# This code can both print the figures to the screen and write the files to .pdf 
+# This code can both print the figures to the screen and write the files to .png 
 # depedning on user settings
 
 import numpy as np
@@ -33,9 +33,9 @@ ax_label_size   = 36 # Font size for axis labels
 title_font_size = 42 # Font size for table title
 marker_type = 'o'  # Type of marker used for plotting google matplotlib for more options
 
-EvA_out_name = "Name_of_EvA.pdf"
-EvV_out_name = "Name_of_EvV.pdf"
-Combined_out_name = "Name_of_Combined.pdf"
+EvA_out_name = "Name_of_EvA.png"
+EvV_out_name = "Name_of_EvV.png"
+Combined_out_name = "Name_of_Combined.png"
 
 #Path to files.  the / is for linux. If you are on windows change them to \
 EsvA = open(path+'/EvsA') #should point to EvsA.txt file
@@ -118,7 +118,7 @@ axarr[1].grid(True, linestyle='-.')
 axarr[1].tick_params(labelcolor='k', labelsize=15, width=3)
 
 
-# Printing plots to a .pdf file
+# Printing plots to a .png file
 if print_to_pdf == True:
     EvV.savefig(EvV_out_name, bbox_inches = 'tight')
     EvA.savefig(EvA_out_name, bbox_inches = 'tight')

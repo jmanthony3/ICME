@@ -197,4 +197,4 @@ savefig(p_TvsK, "./convergence_versus_kpoint.png")
 # #     title="Cutoff Energies" # Title for the legend
 # # )
 # # plt.subplots_adjust(bottom=0.225)
-# # plt.savefig("{filepath}/EvsA_for_energy.svg")
+# # plt.savefig("{filepath}/EvsA_for_energy.png")
