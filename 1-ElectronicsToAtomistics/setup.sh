@@ -95,6 +95,7 @@ echo "Installing by 'sudo apt-get' only for mpi dependencies..."
 
 if [[ "$computing_language" == "julia" ]]; then
     echo "Installing Julia..."
+    sudo apt-get -y install curl
     (set -x; curl -fsSL https://install.julialang.org | sh)
     echo "Updating environment variables for $who..."
     (set -x; source ~/.bashrc)

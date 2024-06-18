@@ -98,13 +98,10 @@ cp "atoms.sh" "../Calculations/0-Scripts/"
 ### get python3 packages for future scripts
 computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
 if [[ "$computing_language" == "julia" ]]; then
-    echo "Installing Julia..."
-    (set -x; curl -fsSL https://install.julialang.org | sh)
-    echo "Updating environment variables for $who..."
-    (set -x; source ~/.bashrc)
-    echo "Adding necessary packages..."
+    echo "Adding necessary Julia packages..."
     (set -x; julia "packages.jl")
     echo "Adding Ovito's Python API to manipulate data files..."
+    (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
     (set -x; python3 -m pip install ovito)
 elif [[ "$computing_language" == "python" ]]; then
     (set -x;

@@ -7,6 +7,7 @@ README/
 README.adoc.py
 *
 # do NOT ignore the following
+!clean.sh
 !index.html
 !LICENSE
 !README.adoc
