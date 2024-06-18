@@ -7,8 +7,8 @@ filepath = pwd()
 REFERENCE_STRUCTURE = "bcc"
 
 # must be same examined in `rescale_commands.sh`
-TEMP = [300] # range(150, 550; step=50) # K
-SIGMA = range(25, 325; step=25) # MPa
+TEMP = [300] # range(150, 500; step=50) # K
+SIGMA = range(25, 300; step=25) # MPa
 # for s in [700, 800, 900, 1000, 1100, 1200]
 #     push!(SIGMA, s)
 # end

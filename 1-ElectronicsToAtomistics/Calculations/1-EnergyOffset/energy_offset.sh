@@ -28,6 +28,8 @@ KPOINTS_SHIFT=( # shift of `KPOINTS` in some direction
     0 # y
     0 # z
 )
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
 NUM_PROC=$(nproc) # grabs all cores available by default
 
 
@@ -43,6 +45,16 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 set +x # turn script tracing off
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    cl_ext="jl"
+elif [[ "$computing_language" == "python" ]]; then
+    cl_ext="py"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
@@ -117,7 +129,7 @@ echo "Energy offset found to be $energy_offset eV"
 
 ### replace offset energies in companion scripts
 sed -i "s%^energy_offset = [[:digit:]]*\.*[[:digit:]]*[^ #]%energy_offset = $energy_offset%" \
-    "../0-Scripts/EvA_EvV_plot.py"
+    "../0-Scripts/EvA_EvV_plot.$cl_ext"
 sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" \
     "../2-KPointStudy/kpoint_study.sh"
 sed -i "s%^ENERGY_OFFSET=[[:digit:]]*\.*[[:digit:]]*[^ #]%ENERGY_OFFSET=$energy_offset%" \
@@ -135,7 +147,15 @@ cd "../0-Scripts"
 gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null # compiles `evfit.f` outputs `evfit`
 # this outputs `evfit.4`: reference structure, lattice parameter
 ./ev_curve $reference_structure $LATTICE_PARAMETER 2> /dev/null
-python3 "EvA_EvV_plot.py" # generate plots
+if [[ "$computing_language" == "julia" ]]; then
+    julia "EvA_EvV_plot.jl" # generate plots
+elif [[ "$computing_language" == "python" ]]; then
+    python3 "EvA_EvV_plot.py" # generate plots
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 # move all output files back to working directory
 mv "$reference_structure.ev.in" "../1-EnergyOffset/"
@@ -145,9 +165,9 @@ mv "EvsV" "../1-EnergyOffset/EvsV_offset"
 mv "SUMMARY" "../1-EnergyOffset/SUMMARY_offset"
 mv "evfit.4" "../1-EnergyOffset/"
 mv "pw_ev.out" "../1-EnergyOffset/"
-mv "Name_of_EvA.pdf" "../1-EnergyOffset/"
-mv "Name_of_EvV.pdf" "../1-EnergyOffset/"
-mv "Name_of_Combined.pdf" "../1-EnergyOffset/"
+mv "Name_of_EvA.png" "../1-EnergyOffset/"
+mv "Name_of_EvV.png" "../1-EnergyOffset/"
+mv "Name_of_Combined.png" "../1-EnergyOffset/"
 rm -r "temp/" # remove calculations temporary folder
 
 
