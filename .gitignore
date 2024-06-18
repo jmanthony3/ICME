@@ -16,8 +16,8 @@ README.adoc.py
 # 1-ElectronicsToAtomistics
 !1-ElectronicsToAtomistics/Calculations/1-EnergyOffset/energy_offset.sh
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/kpoint_study.sh
-!1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.py
 !1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.jl
+!1-ElectronicsToAtomistics/Calculations/2-KPointStudy/which_ecutwfc.py
 !1-ElectronicsToAtomistics/Calculations/3-GSFE/gsfe_create.sh
 !1-ElectronicsToAtomistics/Calculations/3-GSFE/gsfe_process.sh
 !1-ElectronicsToAtomistics/Calculations/Fe.library.meam
@@ -26,15 +26,15 @@ README.adoc.py
 !1-ElectronicsToAtomistics/Files/Cu.in
 !1-ElectronicsToAtomistics/Files/Cu.UPF
 !1-ElectronicsToAtomistics/Files/ev_curve
-!1-ElectronicsToAtomistics/Files/EvA_EvV_plot.py
 !1-ElectronicsToAtomistics/Files/EvA_EvV_plot.jl
+!1-ElectronicsToAtomistics/Files/EvA_EvV_plot.py
 !1-ElectronicsToAtomistics/Files/evfit.f
-!1-ElectronicsToAtomistics/Files/gsfe_curve.py
 !1-ElectronicsToAtomistics/Files/gsfe_curve.jl
-!1-ElectronicsToAtomistics/Files/OutputFileCreator.py
+!1-ElectronicsToAtomistics/Files/gsfe_curve.py
 !1-ElectronicsToAtomistics/Files/OutputFileCreator.jl
-!1-ElectronicsToAtomistics/Files/OutputSummarizer.py
-!1-ElectronicsToAtomistics/Files/OutputSummarizer.jl
+!1-ElectronicsToAtomistics/Files/OutputFileCreator.py
+!1-ElectronicsToAtomistics/Files/OutputFileSummarizer.jl
+!1-ElectronicsToAtomistics/Files/OutputFileSummarizer.py
 !1-ElectronicsToAtomistics/Files/qe-6.0.0.tar.gz
 !1-ElectronicsToAtomistics/Files/rescale_commands.sh
 !1-ElectronicsToAtomistics/elastic_moduli.ipynb
@@ -48,6 +48,7 @@ README.adoc.py
 !2-AtomisticsToDislocations/Calculations/2-MDDP/fcc.sh
 !2-AtomisticsToDislocations/Calculations/2-MDDP/mddp.sh
 !2-AtomisticsToDislocations/Calculations/2-MDDP/run.sh
+!2-AtomisticsToDislocations/Calculations/2-MDDP/stress_strain.jl
 !2-AtomisticsToDislocations/Calculations/2-MDDP/stress_strain.py
 !2-AtomisticsToDislocations/Files/atoms.sh
 !2-AtomisticsToDislocations/Files/Cu.compress.Size3.in
@@ -61,6 +62,7 @@ README.adoc.py
 !2-AtomisticsToDislocations/Files/MDDP.7z
 !2-AtomisticsToDislocations/Files/ovito-basic-3.7.2-x86_64.tar.xz
 !2-AtomisticsToDislocations/Files/rescale_commands.sh
+!2-AtomisticsToDislocations/packages.jl
 !2-AtomisticsToDislocations/setup.sh
 # 3-DislocationMobilityToCrystalPlasticity
 !3-DislocationMobilityToCrystalPlasticity/Calculations/1-CPFEM/cpfem.sh
