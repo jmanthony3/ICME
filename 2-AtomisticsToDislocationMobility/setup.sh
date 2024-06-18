@@ -32,7 +32,13 @@ ELEMENT_NAME="Fe" # Periodic Table identifier of element
 set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
 who=$(whoami) # current user
-mkdir "$execution_dir/logs"
+mkdir "$execution_dir/logs" 2> /dev/null
+if [[ "$#" -eq 0 ]]; then
+    read -sp 'Password for sudo commands: ' pswd
+    echo
+else
+    pswd=$1
+fi
 
 
 
@@ -55,7 +61,7 @@ mkdir "$execution_dir/logs"
 # https://www.ovito.org/linux-downloads/
 # https://www.ovito.org/manual/installation.html
 # copy tarball into installation directory
-mkdir "$OVITO_INSTALL_LOC"
+mkdir "$OVITO_INSTALL_LOC" 2> /dev/null
 cp "Files/$OVITO_VERSION.tar.xz" "$OVITO_INSTALL_LOC/$OVITO_VERSION.tar.xz"
 # unzip with `tar xJfv ovito-basic-X.X.X-*.tar.xz`
 # show progress of untar and write log
@@ -79,8 +85,8 @@ echo "Updating environment variables for $who..."
 ### test directory
 # copy/paste necessary files for example
 cd "$execution_dir/Files"
-mkdir "test" # make test folder
-mkdir "test/RescaleUpload"
+mkdir "test" 2> /dev/null # make test folder
+mkdir "test/RescaleUpload" 2> /dev/null
 # copy (in/out)put files to `./test/RescaleUpload/`
 cp "Cu.meam" "./test/RescaleUpload/$ELEMENT_NAME.meam"
 cp "Dislocation.f90" "./test/RescaleUpload/"
@@ -101,7 +107,7 @@ if [[ "$computing_language" == "julia" ]]; then
     echo "Adding necessary Julia packages..."
     (set -x; julia "packages.jl")
     echo "Adding Ovito's Python API to manipulate data files..."
-    (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
+    (echo $pswd) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
     (set -x; python3 -m pip install ovito)
 elif [[ "$computing_language" == "python" ]]; then
     (set -x;
@@ -120,10 +126,10 @@ fi
 # copy input data files to `../Calculations/2-MDDP/`
 cp "datain" "../Calculations/2-MDDP/"
 cp "data" "../Calculations/2-MDDP/"
-(echo $1) 2> /dev/null | sudo -S apt-get -y install expect # allow execution of expect scripts
+(echo $pswd) 2> /dev/null | sudo -S apt-get -y install expect # allow execution of expect scripts
 
 (set -x;
-    (echo $1) 2> /dev/null | sudo -S apt-get -y install p7zip-full # get `7z` package
+    (echo $pswd) 2> /dev/null | sudo -S apt-get -y install p7zip-full # get `7z` package
     7z x "MDDP.7z" # unarchive
 )
 # move into unarchived MDDP folder

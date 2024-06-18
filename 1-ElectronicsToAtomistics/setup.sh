@@ -10,7 +10,7 @@ QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
 # working language to perform calculations and plot results
 COMPUTING_LANGUAGE="Julia" # can also be "Python"
 # number of processors to use in test case
-NUM_PROC=$(nproc) # grabs all cores available by default
+NUM_PROC=1 # $(nproc) # grabs all cores available by default
 
 
 
@@ -27,7 +27,13 @@ NUM_PROC=$(nproc) # grabs all cores available by default
 set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
 who=$(whoami) # current user
-mkdir "$execution_dir/logs"
+mkdir "$execution_dir/logs" 2> /dev/null
+if [[ "$#" -eq 0 ]]; then
+    read -sp 'Password for sudo commands: ' pswd
+    echo
+else
+    pswd=$1
+fi
 computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
 if [[ "$computing_language" == "julia" ]]; then
     cl_ext="jl"
@@ -46,12 +52,12 @@ fi
 # add `cmake`, `gcc`, `gfortran`, and `make` capabilities.
 echo "Updating distro and including gcc, g++, gfortran, and make..."
 (set -x;
-    (echo $1) 2> /dev/null | sudo -S apt-get -y update
+    (echo $pswd) 2> /dev/null | sudo -S apt-get -y update
     sudo apt-get -y install bc pv gfortran build-essential
 )
 
 # copy tarball into installation directory
-mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC"
+mkdir "$QUANTUM_ESPRESSO_INSTALL_LOC" 2> /dev/null
 cp "$execution_dir/Files/$QUANTUM_ESPRESSO_VERSION"*".tar.gz" \
     "$QUANTUM_ESPRESSO_INSTALL_LOC/"
 
@@ -61,7 +67,7 @@ echo "Extracting tarball of $QUANTUM_ESPRESSO_VERSION..."
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC"
     tar -xzvf "$QUANTUM_ESPRESSO_VERSION.tar.gz"
 # show progress of untar and write log
-) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257293 > "$execution_dir/logs/quantum_espresso_untar.log"
+) 2> "$execution_dir/logs/quantum_espresso_untar.log" | pv -pterb --size 257293 > "$execution_dir/logs/1-quantum_espresso_untar.log"
 
 # `cd` into that extracted folder and execute `./configure`
 echo "Configuring $QUANTUM_ESPRESSO_VERSION..."
@@ -69,7 +75,7 @@ echo "Configuring $QUANTUM_ESPRESSO_VERSION..."
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     ./configure
 # show progress of configure and write log
-) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5559 > "$execution_dir/logs/quantum_espresso_configure.log"
+) 2> "$execution_dir/logs/quantum_espresso_configure.log" | pv -pterb --size 5559 > "$execution_dir/logs/2-quantum_espresso_configure.log"
 
 # `cd` into that extracted folder and execute `make all`
 echo "Making all of $QUANTUM_ESPRESSO_VERSION..."
@@ -77,7 +83,7 @@ echo "Making all of $QUANTUM_ESPRESSO_VERSION..."
     cd "$QUANTUM_ESPRESSO_INSTALL_LOC/q-e-$QUANTUM_ESPRESSO_VERSION"
     make all
 # show progress of make and write log
-) 2> "$execution_dir/logs/quantum_espresso_make.log" | pv -pterb --size 702733 > "$execution_dir/logs/quantum_espresso_make.log"
+) 2> "$execution_dir/logs/quantum_espresso_make.log" | pv -pterb --size 702733 > "$execution_dir/logs/3-quantum_espresso_make.log"
 
 # set `pw.x` as environment variable; change PATH as needed to QE `/bin/` folder
 echo "Setting 'pw.x' as environment variable..."
@@ -91,7 +97,7 @@ echo "Updating environment variables for $who..."
 ### test execution of `EvA_EvV_plot`
 # for mpi dependency
 echo "Installing by 'sudo apt-get' only for mpi dependencies..."
-(set -x; (echo $1) 2> /dev/null | sudo -S apt-get -y install quantum-espresso)
+(set -x; (echo $pswd) 2> /dev/null | sudo -S apt-get -y install quantum-espresso)
 
 if [[ "$computing_language" == "julia" ]]; then
     echo "Installing Julia..."
@@ -105,11 +111,11 @@ fi
 
 # navigate back to appropriate directory
 cd "$execution_dir/Files"
-mkdir "test" # make test folder
+mkdir "test" 2> /dev/null # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
-    mpirun -np $NUM_PROC pw.x -i "Cu.in" > "./test/Cu.out" 2> /dev/null
+    mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
     # compiles `evfit.f` outputs `evfit`
     gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null
 )
@@ -122,7 +128,7 @@ if [[ "$computing_language" == "julia" ]]; then
 elif [[ "$computing_language" == "python" ]]; then
     echo "Ensuring pip3 capabilities for matplotlib and numpy..."
     (set -x;
-        (echo $1) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
+        (echo $pswd) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
         python3 -m pip install matplotlib numpy # install modules
         python3 "EvA_EvV_plot.py" # generate plots
     )
@@ -154,7 +160,7 @@ elif [[ "$computing_language" == "python" ]]; then
     # install python2
     echo "Installing Python 2..."
     (set -x;
-        echo $1 | sudo -S add-apt-repository universe
+        echo $pswd | sudo -S add-apt-repository universe
         sudo apt-get -y update
         sudo apt-get -y install python2 curl
         curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
@@ -182,7 +188,7 @@ rm -r "temp/" # remove calculations temporary folder
 
 
 ### populate `../Calculations/0-Scripts/`
-mkdir "$execution_dir/Calculations/0-Scripts"
+mkdir "$execution_dir/Calculations/0-Scripts" 2> /dev/null
 cp "ev_curve" "../Calculations/0-Scripts/"
 cp "EvA_EvV_plot.$cl_ext" "../Calculations/0-Scripts/"
 cp "evfit.f" "../Calculations/0-Scripts/"
