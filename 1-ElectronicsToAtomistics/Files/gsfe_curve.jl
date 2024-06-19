@@ -19,6 +19,7 @@ dft = "qe"
 
 # Number of processors
 num_proc = Threads.nthreads()
+under_proc = 2
 
 ##### MATERIAL SETTINGS - USER EDIT REQUIRED #####
 
@@ -64,6 +65,14 @@ ry_to_ev = 13.6056849587
 au_to_ang = 0.52917721092
 
 ##### Below this line should not require user edits #####
+
+num_proc = if Threads.nthreads() == 1
+    1
+elseif num_proc - under_proc < 1
+    error("(num_proc=$num_proc) - (under_proc=$under_proc) = $(num_proc - under_proc) which must be greater than 1.")
+elseif num_proc - under_proc <= Threads.nthreads()
+    num_proc - under_proc
+end
 
 # function that creates the geometry and writes the input file
 function create_stackingfault(structure, lp, layers, slip, system=nothing)
