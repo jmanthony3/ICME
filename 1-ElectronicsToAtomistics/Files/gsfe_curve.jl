@@ -18,7 +18,7 @@ using LinearAlgebra: cross, norm
 dft = "qe"
 
 # Number of processors
-num_proc = 6
+num_proc = Threads.nthreads()
 
 ##### MATERIAL SETTINGS - USER EDIT REQUIRED #####
 
@@ -283,8 +283,8 @@ end # end gsfe
 
 function run_qe()
     # run quantum espresso
-    # run(Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
-    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in"])
+    # run(Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
+    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe.in"])
     run(pipeline(cmd_runqe, stdout="gsfe.out"))
 
     # get energy
@@ -334,13 +334,13 @@ function run_vasp()
             if relax
                 # run vasp - first a relaxation, then a static run
                 `cp relax.INCAR INCAR`
-                msg = `mpirun -np $num_proc ./vasp`
+                msg = `mpirun -np $num_proc --use-hwthread-cpus ./vasp`
                 `cp CONTCAR POSCAR`
             end
             `rm WAVECAR CHGCAR`
             `cp gsfe.INCAR INCAR`
             io = IOBuffer()
-            msg = `mpirun -np $num_proc ./vasp`
+            msg = `mpirun -np $num_proc --use-hwthread-cpus ./vasp`
             # pipeline_cmd1 = `$(cmd1) | $(cmd2)`
             cmd_pl_totalenergy  = run(pipeline(cmd_awk_print5; stdin=cmd_tail_lastline_OSZICAR, stdout=io))
             # totalenergy_line    = read(cmd_tail_lastline_OSZICAR, String)

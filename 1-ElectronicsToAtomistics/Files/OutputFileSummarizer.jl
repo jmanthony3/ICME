@@ -18,7 +18,7 @@ using LinearAlgebra: cross, norm
 dft = "qe"
 
 # Number of processors
-num_proc = 6
+num_proc = Threads.nthreads()
 
 ##### MATERIAL SETTINGS - USER EDIT REQUIRED #####
 

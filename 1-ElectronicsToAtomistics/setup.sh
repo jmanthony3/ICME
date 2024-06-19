@@ -10,7 +10,7 @@ QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
 # working language to perform calculations and plot results
 COMPUTING_LANGUAGE="Julia" # can also be "Python"
 # number of processors to use in test case
-NUM_PROC=1 # $(nproc) # grabs all cores available by default
+NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
@@ -115,7 +115,7 @@ mkdir "test" 2> /dev/null # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
-    mpirun -np $NUM_PROC pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
+    mpirun -np $NUM_PROC --use-hwthread-cpus pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
     # compiles `evfit.f` outputs `evfit`
     gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null
 )

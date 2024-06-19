@@ -140,7 +140,7 @@ K_POINTS (automatic)
         ### execute QE with input parameters
         echo "Executing QE according to $input_filename.in..."
         (set -x;
-            mpirun -np $NUM_PROC pw.x -in "$input_filename.in" \
+            mpirun -np $NUM_PROC --use-hwthread-cpus pw.x -in "$input_filename.in" \
                 > "$input_filename.out" 2> /dev/null
         )
 
