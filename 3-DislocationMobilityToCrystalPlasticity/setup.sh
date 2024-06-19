@@ -51,6 +51,7 @@ cp "rescale_commands.sh" "./test/RescaleUpload/"
 
 
 ### populate "../Calculations/0-Scripts/" folder
+mkdir "../Calculations/0-Scripts/" 2> /dev/null
 cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 
 

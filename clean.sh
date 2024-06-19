@@ -39,3 +39,10 @@ cd $execution_dir
 rm -rf ./2-AtomisticsToDislocationMobility/Files/MDDP
 rm -rf ./2-AtomisticsToDislocationMobility/Files/test
 rm -rf ./2-AtomisticsToDislocationMobility/logs
+
+## ./3-DislocationMobilityToCrystalPlasticity
+rm -rf ./3-DislocationMobilityToCrystalPlasticity/Calculations/0-Scripts
+cd ./3-DislocationMobilityToCrystalPlasticity/Calculations/1-CPFEM
+rm -rf !("cpfem.sh"|"voce_hardening_fit.jl"|"voce_hardening_fit.py")
+cd $execution_dir
+rm -rf ./3-DislocationMobilityToCrystalPlasticity/Files/test
