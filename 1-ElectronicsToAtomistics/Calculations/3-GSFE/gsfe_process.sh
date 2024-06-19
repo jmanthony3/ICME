@@ -28,7 +28,8 @@ KPOINTS_SHIFT=( # shift of `KPOINTS` in some direction
     0 # y
     0 # z
 )
-NUM_PROC=$(nproc) # grabs all cores available by default
+NUM_PROC=$(nproc)   # grabs all cores available by default
+UNDER_PROC=2        # number of cores to under-subscribe, if possible
 
 
 
@@ -70,6 +71,15 @@ else
     echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
         not understood. Must be either 'Julia' or 'Python'."
     exit
+fi
+if [[ $(nproc) -eq 1 ]]; then
+    num_proc=1
+elif [[ NUM_PROC - UNDER_PROC -lt 1 ]]; then
+    echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
+        ${NUM_PROC - UNDER_PROC} which must be greater than 1."
+    exit
+elif [[ NUM_PROC - UNDER_PROC -le $(nproc) ]]; then
+    num_proc=$NUM_PROC - $UNDER_PROC
 fi
 
 
@@ -191,7 +201,7 @@ else
     ### execute QE with input parameters
     echo "Executing QE according to $input_filename.in..."
     (set -x;
-        mpirun -np $NUM_PROC --use-hwthread-cpus pw.x -in "$input_filename.in" \
+        mpirun -np $num_proc --use-hwthread-cpus pw.x -in "$input_filename.in" \
             > "$input_filename.out" 2> /dev/null
     )
     rm -r "temp/" # remove calculations temporary folder

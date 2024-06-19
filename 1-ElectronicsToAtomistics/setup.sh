@@ -10,7 +10,8 @@ QUANTUM_ESPRESSO_VERSION="qe-6.0.0"
 # working language to perform calculations and plot results
 COMPUTING_LANGUAGE="Julia" # can also be "Python"
 # number of processors to use in test case
-NUM_PROC=$(nproc) # grabs all cores available by default
+NUM_PROC=$(nproc)   # grabs all cores available by default
+UNDER_PROC=2        # number of cores to under-subscribe, if possible
 
 
 
@@ -43,6 +44,15 @@ else
     echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
         not understood. Must be either 'Julia' or 'Python'."
     exit
+fi
+if [[ $(nproc) -eq 1 ]]; then
+    num_proc=1
+elif [[ NUM_PROC - UNDER_PROC -lt 1 ]]; then
+    echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
+        ${NUM_PROC - UNDER_PROC} which must be greater than 1."
+    exit
+elif [[ NUM_PROC - UNDER_PROC -le $(nproc) ]]; then
+    num_proc=$NUM_PROC - $UNDER_PROC
 fi
 
 
@@ -115,7 +125,7 @@ mkdir "test" 2> /dev/null # make test folder
 echo "Executing QE according to Cu.in..."
 (set -x;
     # execute QE with input parameters
-    mpirun -np $NUM_PROC --use-hwthread-cpus pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
+    mpirun -np $num_proc --use-hwthread-cpus pw.x -in "Cu.in" > "./test/Cu.out" 2> /dev/null
     # compiles `evfit.f` outputs `evfit`
     gfortran -std=legacy -O2 "evfit.f" -o "evfit" 2> /dev/null
 )

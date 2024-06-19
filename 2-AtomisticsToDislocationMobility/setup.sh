@@ -9,8 +9,6 @@ OVITO_INSTALL_LOC=~/Ovito
 OVITO_VERSION="ovito-basic-3.7.2-x86_64"
 # working language to perform calculations and plot results
 COMPUTING_LANGUAGE="Julia" # can also be "Python"
-# number of processors to use in test case
-NUM_PROC=$(nproc) # grabs all cores available by default
 
 
 
