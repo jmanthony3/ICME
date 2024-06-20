@@ -53,7 +53,7 @@ relax = false
 # Number or location of simulated points. It MUST start with 0.
 #fault_points = [0.0, 1./4., 1./2.]
 # fault_points = np.linspace(0,1,16)
-fault_points = range(0, 16; step=1)
+fault_points = range(1, 16; step=1)
 # Size of vacuum in Ang.
 vacuum = 20.0
 # Number of stacking layers - CAREFUL, DFT scales very poorly with more atoms
@@ -297,9 +297,9 @@ end # end gsfe
 
 function run_qe(filenum)
     # run quantum espresso
-    # run(Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
-    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in"])
-    run(pipeline(cmd_runqe, stdout="gsfe.out"))
+    # # run(Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
+    # cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe_$filenum.in"])
+    # run(pipeline(cmd_runqe, stdout="gsfe_$filenum.out"))
 
     # get energy
     io = IOBuffer()
@@ -346,8 +346,8 @@ function run_qe(filenum)
     end
 
     # return [float(p2.communicate()[1]), time]
-    # return [parse(Float64, p2), time]
-    return foo, time
+    return parse(Float64, totalenergy_str), time
+    # return foo, time
 end # end run_qe
 
 function run_vasp()

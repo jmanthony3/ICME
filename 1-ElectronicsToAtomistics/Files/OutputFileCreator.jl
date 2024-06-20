@@ -298,8 +298,8 @@ end # end gsfe
 
 function run_qe()
     # run quantum espresso
-    # run(Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
-    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "pw.x", "-in", "gsfe.in"])
+    # run(Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe.in", " > ", "gsfe.out"]))
+    cmd_runqe = Cmd(["mpirun", "-np", "$num_proc", "--use-hwthread-cpus", "pw.x", "-in", "gsfe.in"])
     run(pipeline(cmd_runqe, stdout="gsfe.out"))
 
     # get energy

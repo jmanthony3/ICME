@@ -28,6 +28,8 @@ KPOINTS_SHIFT=( # shift of `KPOINTS` in some direction
     0 # y
     0 # z
 )
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
 NUM_PROC=$(nproc)   # grabs all cores available by default
 UNDER_PROC=2        # number of cores to under-subscribe, if possible
 
@@ -72,14 +74,15 @@ else
         not understood. Must be either 'Julia' or 'Python'."
     exit
 fi
+num_proc=$(echo "$NUM_PROC - $UNDER_PROC" | bc)
 if [[ $(nproc) -eq 1 ]]; then
     num_proc=1
-elif [[ NUM_PROC - UNDER_PROC -lt 1 ]]; then
+elif [[ $num_proc -lt 1 ]]; then
     echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
         ${NUM_PROC - UNDER_PROC} which must be greater than 1."
     exit
-elif [[ NUM_PROC - UNDER_PROC -le $(nproc) ]]; then
-    num_proc=$NUM_PROC - $UNDER_PROC
+# elif [[ $NUM_PROC - $UNDER_PROC -le $(nproc) ]]; then
+    # num_proc=$NUM_PROC - $UNDER_PROC
 fi
 
 
@@ -157,8 +160,8 @@ else
 fi
 
 # modify `OutputFileCreator` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
-    "../0-Scripts/OutputFileCreator.$cl_ext"
+# sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 10%" \
+#     "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
     "../0-Scripts/OutputFileCreator.$cl_ext"
 sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \
@@ -175,8 +178,8 @@ sed -i "s%f.write(\"mixing_beta = [[:digit:]]*\.*[[:digit:]]*, conv_thr = 0.0000
     "../0-Scripts/OutputFileCreator.$cl_ext"
 
 # modify `OutputFileSummarizer` script
-sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 16%" \
-    "../0-Scripts/OutputFileSummarizer.$cl_ext"
+# sed -i "s%^num_proc = [[:digit:]]*[^ #]%num_proc = 10%" \
+#     "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^el = '[[:print:]]*'[^ #]%el = '$ELEMENT_NAME'%" \
     "../0-Scripts/OutputFileSummarizer.$cl_ext"
 sed -i "s%^potential = '[[:print:]]*'[^ #]%potential = '$PSEUDOPOTENTIAL_FILENAME'%" \

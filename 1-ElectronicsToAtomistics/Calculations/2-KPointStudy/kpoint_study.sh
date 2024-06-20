@@ -61,14 +61,15 @@ else
         not understood. Must be either 'Julia' or 'Python'."
     exit
 fi
+num_proc=$(echo "$NUM_PROC - $UNDER_PROC" | bc)
 if [[ $(nproc) -eq 1 ]]; then
     num_proc=1
-elif [[ NUM_PROC - UNDER_PROC -lt 1 ]]; then
+elif [[ $num_proc -lt 1 ]]; then
     echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
         ${NUM_PROC - UNDER_PROC} which must be greater than 1."
     exit
-elif [[ NUM_PROC - UNDER_PROC -le $(nproc) ]]; then
-    num_proc=$NUM_PROC - $UNDER_PROC
+# elif [[ $NUM_PROC - $UNDER_PROC -le $(nproc) ]]; then
+    # num_proc=$NUM_PROC - $UNDER_PROC
 fi
 
 
