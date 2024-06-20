@@ -50,7 +50,7 @@ if [[ $(nproc) -eq 1 ]]; then
     num_proc=1
 elif [[ $num_proc -lt 1 ]]; then
     echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
-        ${NUM_PROC - UNDER_PROC} which must be greater than 1."
+        $num_proc which must be greater than 1."
     exit
 # elif [[ $NUM_PROC - $UNDER_PROC -le $(nproc) ]]; then
     # num_proc=$NUM_PROC - $UNDER_PROC
