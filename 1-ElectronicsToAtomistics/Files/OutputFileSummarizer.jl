@@ -324,7 +324,7 @@ function run_qe(filenum)
     # get walltime
     io = IOBuffer()
     time = try
-        cmd_grep_PWSCF      = `grep 'PWSCF' gsfe.out`
+        cmd_grep_PWSCF      = `grep 'PWSCF' gsfe_$filenum.out`
         cmd_tail_lastline   = `tail -n1`
         # pipeline_cmd2 = run(Cmd(["$cmd3", " | ", "$cmd4"]))
         cmd_pl_walltime     = run(pipeline(cmd_tail_lastline; stdin=cmd_grep_PWSCF, stdout=io))

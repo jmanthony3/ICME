@@ -22,7 +22,8 @@ set +x # turn script tracing off
 
 
 ###################### CREATE ENVIRONMENT #####################
-rm -r "RescaleUpload/" 2> /dev/null || mkdir "RescaleUpload"
+# rm -r "RescaleUpload/" 2> /dev/null
+mkdir "RescaleUpload" 2> /dev/null
 (mkdir "RescaleDownload"; mkdir "PositionFrameData") 2> /dev/null
 # copy input files to `RescaleUpload/`
 cp "../../../1-ElectronicsToAtomistics/Calculations/$ELEMENT_NAME.parameter.meam" "./RescaleUpload/$ELEMENT_NAME.meam"

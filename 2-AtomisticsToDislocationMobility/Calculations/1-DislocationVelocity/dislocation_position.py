@@ -1,6 +1,8 @@
+# if running WSL, then run from localhost NOT from within WSL
+
 import numpy as np
 import os
-import ovito
+import ovito # must be installed on localhost Python kernel
 import sys
 
 filepath = os.path.dirname(os.path.abspath(__file__))

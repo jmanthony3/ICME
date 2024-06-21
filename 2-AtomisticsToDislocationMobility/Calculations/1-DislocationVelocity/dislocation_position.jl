@@ -1,6 +1,8 @@
+# if running WSL, then run from localhost NOT from within WSL
+
 using Printf
 using PyCall
-@pyimport ovito
+ovito = pyimport("ovito") # must be installed on localhost Python kernel
 
 filepath = pwd()
 
@@ -39,10 +41,10 @@ for temp in TEMP
         pipeline.modifiers.append(ovito.modifiers.ComputePropertyModifier(
             output_property="Time",
             expressions="Timestep"))
-        for frame in range(pipeline.source.num_frames)
+        for frame in range(0, pipeline.source.num_frames - 1)
             data = pipeline.compute(frame)
-            ovito.io.export_file(data, f"{filepath}/PositionFrameData/{temp}/{sigma}/lammps.{frame}.xyz", "xyz", multiple_frames=True, columns=["Particle Identifier", "Position", "Centrosymmetry", "Color", "Structure Type", "Time"])
+            ovito.io.export_file(data, "$filepath/PositionFrameData/$temp/$sigma/lammps.$frame.xyz", "xyz", multiple_frames=true, columns=["Particle Identifier", "Position", "Centrosymmetry", "Color", "Structure Type", "Time"])
         end
     end
 end
-print("Done.")
+print("\e[2K"); println("Done.")

@@ -95,6 +95,7 @@ cp "atoms.sh" "./test/RescaleUpload/"
 
 
 ### populate `../Calculations/0-Scripts/`
+mkdir "../Calculations/0-Scripts/" 2> /dev/null
 cp "rescale_commands.sh" "../Calculations/0-Scripts/"
 cp "atoms.sh" "../Calculations/0-Scripts/"
 
@@ -104,9 +105,9 @@ computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
 if [[ "$computing_language" == "julia" ]]; then
     echo "Adding necessary Julia packages..."
     (set -x; julia "$execution_dir/packages.jl")
-    echo "Adding Ovito's Python API to manipulate data files..."
-    (echo $pswd) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
-    (set -x; python3 -m pip install ovito)
+    # echo "Adding Ovito's Python API to manipulate data files..."
+    # (echo $pswd) 2> /dev/null | sudo -S apt-get -y install python3-pip # install pip3
+    # (set -x; python3 -m pip install ovito)
 elif [[ "$computing_language" == "python" ]]; then
     (set -x;
         python3 -m pip install engineering_notation joby_m_anthony_iii ovito pandas sympy
