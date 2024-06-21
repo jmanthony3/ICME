@@ -27,8 +27,8 @@ STRAIN = [3.] # float.(range(1, 6; step=1)) # 1/s
 # append!(STRAIN, float.([-3, -2, -1]))
 STRAIN .^= 10.
 
-skip = 150
-columns = ["timenow", "disDensity", "Stress", "Strain", "S1", "S2", "S3", "S23", "S31", "S12", "p1", "p2", "p3", "p23", "p31",  "p12", "jogs", "junctions", "CrossSlip"]
+skip = 50
+columns = ["timenow", "disDensity", "Stress", "Strain", "S1", "S2", "S3", "S23", "S31", "S12", "p1", "p2", "p3", "p23", "p31", "p12", "jogs", "junctions", "CrossSlip"]
 
 do_monitor = true
 
