@@ -21,13 +21,15 @@
 using CSV
 using DataFrames
 using LaTeXStrings
-using Plots
+using Plots; gr()
 
 
 
 #######################################################
 ###                  User Settings                  ###
 #######################################################
+
+default(grid=false, framestyle=:box)
 
 # display or print out
 write_to_screen = false

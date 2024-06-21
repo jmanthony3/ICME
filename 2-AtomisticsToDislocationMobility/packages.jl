@@ -7,6 +7,7 @@ Pkg.add("LaTeXStrings")
 Pkg.add("LinearAlgebra")
 Pkg.add("Plots")
 Pkg.add("Printf")
+Pkg.add("Symbolics")
 Pkg.add(url="https://github.com/jmanthony3/NumericalMethods.jl.git")
 
 

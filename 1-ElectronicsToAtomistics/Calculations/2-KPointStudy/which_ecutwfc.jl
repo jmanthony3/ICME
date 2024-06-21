@@ -9,7 +9,8 @@
 
 using CSV
 using DataFrames
-using Plots
+using Plots; gr()
+
 default(grid=false, framestyle=:box)
 
 plot_first = true

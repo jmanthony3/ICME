@@ -6,6 +6,8 @@
 ### general
 REFERENCE_STRUCTURE="bcc" # crystal structure
 ELEMENT_NAME="Fe" # Periodic Table identifier of element
+# working language to perform calculations and plot results
+COMPUTING_LANGUAGE="Julia" # can also be "Python"
 
 
 ### `DDinput`
@@ -34,6 +36,16 @@ TIMESTEP="1.e-12" # [s]
 
 set +x # turn script tracing off
 execution_dir=$(pwd) # where script executes from
+computing_language=$(echo $COMPUTING_LANGUAGE | tr '[:upper:]' '[:lower:]')
+if [[ "$computing_language" == "julia" ]]; then
+    cl_ext="jl"
+elif [[ "$computing_language" == "python" ]]; then
+    cl_ext="py"
+else
+    echo "Variable COMPUTING_LANGUAGE=$COMPUTING_LANGUAGE \
+        not understood. Must be either 'Julia' or 'Python'."
+    exit
+fi
 
 
 
@@ -119,7 +131,7 @@ clear; (set -x; ./run.sh "$execution_dir")
 sleep 10s # let previous process spin up
 pid=$(pgrep MDDP08-2008) # get pid of `MDDP08-2008` process
 echo "Kill the 'MDDP08-2008' process ('PID=$pid') whenever desired."
-echo "Run the 'stress_strain.py' script at any time for live viewing."
+echo "Run the 'stress_strain.$cl_ext' script at any time for live viewing."
 
 
 
