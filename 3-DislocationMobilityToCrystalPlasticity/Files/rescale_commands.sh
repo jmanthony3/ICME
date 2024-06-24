@@ -14,6 +14,9 @@ KAPPA_S=0.3101737291184037 # [MPa]
 declare -a STRAIN_INCREMENT=(1000 1000 1000) # number of substeps
 declare -a STRAIN_RATE=(0.0001 -0.0001 0.0001) # [s]
 declare -a STRAIN=(1. 1. 1.) # number to repeat substeps
+# number of processors to use in test case
+NUM_PROC=$(nproc)   # grabs all cores available by default
+UNDER_PROC=2        # number of cores to under-subscribe, if possible
 
 
 
@@ -28,6 +31,16 @@ declare -a STRAIN=(1. 1. 1.) # number to repeat substeps
 
 
 set +x # turn script tracing off
+num_proc=$(echo "$NUM_PROC - $UNDER_PROC" | bc)
+if [[ $(nproc) -eq 1 ]]; then
+    num_proc=1
+elif [[ $num_proc -lt 1 ]]; then
+    echo "(NUM_PROC=$NUM_PROC) - (UNDER_PROC=$UNDER_PROC) = \
+        $num_proc which must be greater than 1."
+    exit
+# elif [[ $NUM_PROC - $UNDER_PROC -le $(nproc) ]]; then
+    # num_proc=$NUM_PROC - $UNDER_PROC
+fi
 
 
 
@@ -110,7 +123,7 @@ sed -i "7828s%^      RATE = 0.0001D-00%      RATE = ${STRAIN_RATE[0]}D-00%" \
     "./umat_xtal.f"
 
 (set -x; # execute Abaqus with input parameters for tension
-    abaqus job=icme.cpfem.single.tension input=rve.single.inp user=umat_xtal.f cpus=2 double
+    abaqus job=icme.cpfem.single.tension input=rve.single.inp user=umat_xtal.f cpus=$num_proc double
 )
 
 cd "../" # navigate back to working directory
@@ -136,7 +149,7 @@ sed -i "7828s%^      RATE = 0.0001D-00%      RATE = ${STRAIN_RATE[1]}D-00%" \
     "./umat_xtal.f"
 
 (set -x; # execute Abaqus with input parameters for compression
-    abaqus job=icme.cpfem.single.compression input=rve.single.inp user=umat_xtal.f cpus=2 double
+    abaqus job=icme.cpfem.single.compression input=rve.single.inp user=umat_xtal.f cpus=$num_proc double
 )
 
 cd "../" # navigate back to working directory
@@ -180,7 +193,7 @@ sed -i "7828s%^      RATE = 0.0001D-00%      RATE = ${STRAIN_RATE[2]}D-00%" \
     "./umat_xtal.f"
 
 (set -x; # execute Abaqus with input parameters for shear
-    abaqus job=icme.cpfem.single.shear input=rve.single.inp user=umat_xtal.f cpus=2 double
+    abaqus job=icme.cpfem.single.shear input=rve.single.inp user=umat_xtal.f cpus=$num_proc double
 )
 
 
