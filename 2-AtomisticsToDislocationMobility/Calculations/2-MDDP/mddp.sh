@@ -8,6 +8,7 @@ REFERENCE_STRUCTURE="bcc" # crystal structure
 ELEMENT_NAME="Fe" # Periodic Table identifier of element
 # working language to perform calculations and plot results
 COMPUTING_LANGUAGE="Julia" # can also be "Python"
+RESUME_PREVIOUS=1 # 0: start fresh; 1: resume from previous run
 
 
 ### `DDinput`
@@ -123,6 +124,13 @@ else
     echo "Variable REFERENCE_STRUCTURE=$REFERENCE_STRUCTURE \
         not understood. Must be either 'fcc' or 'bcc'."
     exit
+fi
+
+if [[ $RESUME_PREVIOUS -eq 1 ]]; then
+    echo "Resuming from previous run..."
+    mkdir "temp" # 2> dev/null
+    mv "./DDtimeResults.out" "./temp/"
+    cp "./RESTART.FILE" "./DDinput"
 fi
 
 

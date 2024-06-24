@@ -27,24 +27,39 @@ STRAIN = [3.] # float.(range(1, 6; step=1)) # 1/s
 # append!(STRAIN, float.([-3, -2, -1]))
 STRAIN .^= 10.
 
-skip = 50
+skip = 150
 columns = ["timenow", "disDensity", "Stress", "Strain", "S1", "S2", "S3", "S23", "S31", "S12", "p1", "p2", "p3", "p23", "p31", "p12", "jogs", "junctions", "CrossSlip"]
 
 do_monitor = true
 
 if do_monitor
-    data = CSV.read("$filepath/DDtimeResults.out", DataFrame; header=columns, skipto=4, delim=' ', ignorerepeated=true, types=Float64)
-    ax = scatter(
-        data[!, "Strain"][begin:skip:end],
-        data[!, "Stress"][begin:skip:end] ./ 1e6, # MPa
-        label="", # "$strain \$\\frac{1}{s}\$",
-        # xscale=:log10,
-        xlabel="True Strain (\$\\epsilon\$)",
-        # yscale=:log10,
-        ylabel="True Stress (\$\\sigma\$) [\$MPa\$]",
-        title="Stress-Strain Curve",
-    )
-    savefig(ax, "stress_strain-monitor.png")
+    resuming, data0 = try
+        true, CSV.read("$filepath/temp/DDtimeResults.out", DataFrame; header=columns, skipto=4, delim=' ', ignorerepeated=true, types=Float64)
+    catch exc
+        if isa(exc, ArgumentError)
+            false, nothing
+        end
+    end
+    while do_monitor
+        data = CSV.read("$filepath/DDtimeResults.out", DataFrame; header=columns, skipto=4, delim=' ', ignorerepeated=true, types=Float64)
+        if resuming
+            append!(data0, data)
+            data = data0
+            sort!(data, "Strain")
+        end
+        ax = scatter(
+            data[!, "Strain"][begin:skip:end],
+            data[!, "Stress"][begin:skip:end] ./ 1e6, # MPa
+            label="", # "$strain \$\\frac{1}{s}\$",
+            # xscale=:log10,
+            xlabel="True Strain (\$\\epsilon\$)",
+            # yscale=:log10,
+            ylabel="True Stress (\$\\sigma\$) [\$MPa\$]",
+            title="Stress-Strain Curve",
+        )
+        savefig(ax, "stress_strain-monitor.png")
+        sleep(30)
+    end
 else
     for temp in TEMP
         local ax = plot(
